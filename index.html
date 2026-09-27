@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}</style>
+<title>กินไหนดี</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F3F5F2; --surface:#FFFFFF; --surface-2:#E9EDE8; --ink:#17201C; --ink-2:#4C5A53; --ink-3:#7C8983;
+  --line:#D6DDD7; --accent:#FFCB05; --accent-ink:#111111; --accent-soft:#FFF3B8;
+  --nori:#151515; --nori-soft:#F0F0ED; --star:#F39A16;
+  --ok:#1F7A4D; --ok-soft:#DDF2E6; --warn:#A45F00; --warn-soft:#FBEBCF; --bad:#B42318; --bad-soft:#FBE0DD;
+  --shadow:0 1px 2px rgba(23,32,28,.06),0 6px 18px rgba(23,32,28,.06);
+  --f-display:"Prompt",system-ui,sans-serif;
+  --f-body:"Prompt",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Prompt",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;padding-inline:16px;padding-block:0 48px}
+.wrap{max-width:760px;margin:0 auto}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 10px;margin-inline:-16px;padding-inline:16px;border-bottom:1px solid var(--line)}
+.top-in{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.brand h1{font-family:var(--f-display);font-weight:700;font-size:24px;margin:0;letter-spacing:-.01em}
+.brand h1 span{color:var(--accent)}
+.sample{font-size:12px;color:var(--ink-3);text-align:right}
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.st{display:flex;flex-direction:column;gap:4px;background:none;border:0;padding:0;text-align:left;min-width:0}
+.st .bar{height:4px;border-radius:2px;background:var(--line)}
+.st.done .bar{background:var(--nori)}
+.st.cur .bar{background:var(--accent)}
+.st .lb{font-size:11px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.02em}
+.st.done .lb{color:var(--ink-2)}
+.st.cur .lb{color:var(--ink);font-weight:600}
+.st:disabled{cursor:default}
+
+.crumbs{display:flex;flex-wrap:wrap;gap:6px;min-height:0}
+.crumb{font-size:12.5px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--ink-2)}
+.crumb b{color:var(--ink);font-weight:600}
+
+/* step body */
+.stage{padding-top:22px;display:flex;flex-direction:column;gap:16px}
+.q{display:flex;flex-direction:column;gap:2px}
+.q .no{font-family:var(--f-mono);font-size:12px;color:var(--accent);letter-spacing:.06em}
+.q h2{font-family:var(--f-display);font-weight:600;font-size:26px;margin:0;line-height:1.25;text-wrap:balance}
+.q p{margin:0;color:var(--ink-2)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.opt{position:relative;display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;transition:border-color .15s,transform .15s}
+.opt:hover{border-color:var(--ink-3)}
+.opt:active{transform:scale(.99)}
+.opt .big{font-family:var(--f-display);font-weight:600;font-size:18px;line-height:1.3}
+.opt .sub{font-size:12.5px;color:var(--ink-3)}
+.opt .cnt{font-family:var(--f-mono);font-size:11.5px;color:var(--nori);margin-top:6px}
+.opt .ico{font-size:22px;line-height:1;margin-bottom:6px}
+.opt.sel{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
+.opt.sel::after{content:"✓";position:absolute;top:10px;right:12px;font-weight:700;color:var(--accent)}
+.opt .desc{font-size:13px;color:var(--ink-2);margin-top:4px}
+
+.areabar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.areabar input{flex:1 1 240px;min-width:0;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.areabar input:focus{outline:2px solid var(--accent);outline-offset:1px}
+.areabar .grp{display:flex;gap:6px}
+.locbox{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.loc-h{display:flex;flex-direction:column;gap:2px}
+.loc-h b{font-family:var(--f-display);font-size:17px;font-weight:600}
+.loc-h b::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);margin-right:9px;vertical-align:middle}
+.loc-h span{font-size:13px;color:var(--ink-2)}
+.locbox .chip{font-size:13px;padding:4px 12px}
+.chip.mine{border-color:var(--accent);color:var(--accent)}
+.chip.mine.sel{background:var(--accent);color:var(--accent-ink)}
+.locin,.savebar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.locin input,.savebar input{flex:1 1 220px;min-width:0;font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.locin .btn,.savebar .btn{padding:9px 14px}
+.err{margin:0;font-size:13px;color:var(--bad)}
+.locnow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;font-size:14px;background:var(--surface-2);border-radius:10px;padding:8px 10px}
+.mono{font-family:var(--f-mono);font-size:12px;color:var(--ink-3)}
+.move{font-size:13.5px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.radius{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.radius>span{font-size:12px;color:var(--ink-3)}
+.dist{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3)}
+.dist.in{color:var(--accent)}
+.opt.near{border-style:dashed;border-color:var(--accent)}
+.opt:disabled{opacity:.5;cursor:not-allowed}
+.row-label{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px}
+.chip.sel{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.chip small{color:inherit;opacity:.65;font-family:var(--f-mono);font-size:11px;margin-left:4px}
+
+.actions{display:flex;gap:10px;justify-content:space-between;align-items:center;padding-top:4px}
+.btn{border-radius:10px;padding:11px 18px;font-weight:600;border:1px solid var(--line);background:var(--surface)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:none;border-color:transparent;color:var(--ink-2);padding-inline:4px}
+
+/* results */
+.sumline{font-family:var(--f-display);font-size:22px;font-weight:600;margin:0;line-height:1.3;text-wrap:balance}
+.sumline em{font-style:normal;color:var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 12px;background:var(--surface-2);border-radius:12px}
+.toolbar .grp{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.toolbar .grp>span{font-size:12px;color:var(--ink-3)}
+.tg{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:13px}
+.tg.sel{background:var(--nori);border-color:var(--nori);color:var(--surface)}
+.hint{font-size:12.5px;color:var(--ink-3);margin:0}
+
+.list{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:12px}
+.card.closed{opacity:.62}
+.c-head{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start}
+.rank{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);padding-top:4px;min-width:22px}
+.c-name{font-family:var(--f-display);font-weight:600;font-size:19px;line-height:1.3;margin:0}
+.c-meta{font-size:13px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:2px}
+.score{text-align:right;display:flex;flex-direction:column;align-items:flex-end}
+.score .num{font-family:var(--f-display);font-weight:700;font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
+.score .stars{color:var(--star);font-size:12px;letter-spacing:1px}
+.score .rv{font-size:11.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;border-radius:999px;padding:1px 9px}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.p-ok{background:var(--ok-soft);color:var(--ok)}
+.p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-bad{background:var(--bad-soft);color:var(--bad)}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;border-top:1px dashed var(--line);padding-top:12px}
+.fact{display:flex;flex-direction:column;gap:1px;min-width:0}
+.fact .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.fact .v{font-size:14px;overflow-wrap:anywhere}
+.fact .v.mono{font-family:var(--f-mono);font-size:13.5px}
+.tel{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.copy{font-size:11.5px;border:1px solid var(--line);background:var(--surface-2);border-radius:6px;padding:0 8px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;color:var(--nori);background:var(--nori-soft);border-radius:6px;padding:1px 8px}
+.fav{background:none;border:0;font-size:20px;line-height:1;padding:2px;color:var(--ink-3)}
+.fav.on{color:var(--accent)}
+.c-foot{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.why{font-size:12px;color:var(--ink-3)}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:24px;text-align:center;color:var(--ink-2)}
+.maps{display:block;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--ink);text-decoration:none;font-size:14px}
+.maps b{color:var(--accent)}
+.note{font-size:12.5px;color:var(--ink-3);border-left:3px solid var(--line);padding-left:10px;margin:0}
+
+@media (max-width:480px){
+  .q h2{font-size:22px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .facts{grid-template-columns:1fr}
+  .steps .lb{font-size:10px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* MAGAZINE #9 · MOBILE-FIRST */
+:root{--bg:#F5F4F0;--surface:#fff;--surface-2:#F0EFEA;--ink:#111;--ink-2:#5C5C58;--ink-3:#8A8983;--line:#E3E0D8;--shadow:0 10px 30px rgba(20,18,12,.08)}
+body{padding-inline:14px;padding-bottom:92px;background:linear-gradient(180deg,#fff 0,#F5F4F0 260px);font-weight:400}
+.wrap,.top-in{max-width:680px}
+.top{background:rgba(255,255,255,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);padding-block:12px 10px;box-shadow:0 1px 0 rgba(0,0,0,.05)}
+.brand{align-items:center}.brand h1{font-size:28px;font-weight:700;letter-spacing:-.045em}.brand h1 span{color:#E3A900}.sample{font-size:10px;max-width:150px;line-height:1.3}
+.steps{gap:5px}.st .bar{height:3px;background:#E9E7E0}.st.cur .bar{background:#FFCB05}.st.done .bar{background:#171717}.st .lb{font-size:9.5px}.st.cur .lb{font-weight:600}
+.stage{padding-top:18px;gap:15px}.q{gap:6px}.q .no{font-size:10px;color:#A97900;font-weight:600}.q h2{font-size:29px;font-weight:700;letter-spacing:-.035em;line-height:1.18}.q p{font-size:13px}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.opt{min-height:118px;border:0;border-radius:18px;padding:16px;background:#fff;box-shadow:var(--shadow)}.opt .ico{font-size:28px}.opt .big{font-size:17px;font-weight:600}.opt .sub{font-size:11.5px}.opt.sel{background:#FFF4BE;box-shadow:inset 0 0 0 2px #FFCB05,0 10px 30px rgba(20,18,12,.06)}
+.locbox,.card{border:0;border-radius:20px;box-shadow:var(--shadow)}.locbox{padding:16px}.chip{min-height:40px;padding:8px 14px;border-color:#E5E2D9;background:#fff;font-size:13px}.chip.sel{background:#171717;border-color:#171717;color:#fff}
+.btn{min-height:46px;border-radius:14px;padding:11px 18px}.btn.primary{background:#FFCB05;border-color:#FFCB05;color:#111}.actions{position:sticky;bottom:10px;z-index:4;background:rgba(245,244,240,.88);backdrop-filter:blur(12px);margin-inline:-4px;padding:8px 4px;border-radius:18px}
+.sumline{font-size:24px;font-weight:700}.sumline em{color:#B57E00}.toolbar{background:#fff;border:1px solid #ECE9E1;border-radius:16px;padding:10px}.tg{min-height:36px;border-radius:999px}.tg.sel{background:#FFCB05;border-color:#FFCB05;color:#111}
+.list{gap:10px}.card{padding:15px}.c-name{font-size:18px;font-weight:600}.score .num{font-size:22px}.tag{background:#F4F1E8;color:#544817}.maps{background:#FFCB05;border:0;border-radius:15px;text-align:center;font-weight:600;padding:13px}.maps b{color:#111}
+.crumb{background:#fff;border:0;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+@media(max-width:480px){body{padding-inline:12px}.top{margin-inline:-12px;padding-inline:12px}.q h2{font-size:26px}.brand h1{font-size:25px}.facts{grid-template-columns:1fr 1fr}.card{border-radius:18px}.c-head{gap:8px}.score .rv{font-size:10px}}
+@media(max-width:360px){.grid{grid-template-columns:1fr}.facts{grid-template-columns:1fr}.sample{display:none}}
+</style>
+
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#FFD400">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="กินไหนดี">
+</head>
+<body>
+
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">
+      <h1>กินไหน<span>ดี</span></h1>
+      <div class="sample">ต้นแบบ · ข้อมูลร้านเป็นข้อมูลจำลอง</div>
+    </div>
+    <div class="steps" id="steps"></div>
+    <div class="crumbs" id="crumbs"></div>
+  </div>
+</div>
+<main class="wrap"><div class="stage" id="stage"></div></main>
+
+<script>
+/* ---------- master data (ตัวอย่าง) ---------- */
+const COUNTRIES = {
+  jp:{name:"ญี่ปุ่น",en:"Japan",tz:"Asia/Tokyo",cur:"¥",cities:{
+    tokyo:{name:"โตเกียว",en:"Tokyo",areas:{
+      shinjuku:["ชินจูกุ","Shinjuku","ราเมง อิซากายะ ชีวิตกลางคืน"],
+      shibuya:["ชิบูย่า","Shibuya","ยากินิคุ ร้านเปิดดึก คาเฟ่"],
+      harajuku:["ฮาราจุกุ / โอโมเตะซันโด","Harajuku","ของหวานเทรนด์ใหม่ กิวคัตสึ"],
+      ebisu:["เอบิสุ / ไดคังยามะ","Ebisu","ร้านเก๋ ตรอกโยโกโจ ของหวาน"],
+      nakameguro:["นากาเมกุโระ","Nakameguro","ริมคลองเมกุโระ คาเฟ่ ยากิโทริ"],
+      shimokita:["ชิโมคิตะซาวะ","Shimokitazawa","ร้านวินเทจ ซุปแกงกะหรี่"],
+      roppongi:["รปปงงิ / อาซาบุ","Roppongi","ร้านหรู เทปปันยากิ โซบะ"],
+      ginza:["กินซ่า / สึกิจิ","Ginza","ไฟน์ไดนิ่ง ซูชิตลาดสึกิจิ"],
+      marunouchi:["โตเกียวสเตชั่น / มารุโนะอุจิ","Tokyo Station","ถนนราเมงใต้สถานี ปลาไหล"],
+      akihabara:["อากิฮาบาระ / คันดะ","Akihabara","แกงกะหรี่ ร้านเร็ว ราคาถูก"],
+      ueno:["อุเอโนะ / อาเมโยโกะ","Ueno","ตลาดอาเมโยโกะ ข้าวหน้าซีฟู้ด"],
+      asakusa:["อาซากุสะ","Asakusa","เทมปุระ ของกินรอบวัดเซ็นโซจิ"],
+      ikebukuro:["อิเคะบุคุโระ","Ikebukuro","ราเมงเปิดดึก ยากินิคุบุฟเฟต์"]}},
+    osaka:{name:"โอซาก้า",en:"Osaka",areas:{
+      namba:["นัมบะ / โดทงโบริ","Namba","ทาโกะยากิ โอโคโนมิยากิ"],
+      shinsaibashi:["ชินไซบาชิ / อเมมูระ","Shinsaibashi","ช้อปปิ้ง ชีสเค้ก ราเมงดึก"],
+      kuromon:["ตลาดคุโรมง","Kuromon Market","ซีฟู้ดสด หอยเม่น ปลาปักเป้า"],
+      shinsekai:["ชินเซไก","Shinsekai","คุชิคัตสึต้นตำรับ ใต้หอสึเทนคาคุ"],
+      umeda:["อุเมดะ / คิตะชินจิ","Umeda","วากิว ร้านหรู คาเฟ่ในห้าง"],
+      tenma:["เท็นมะ","Tenma","ถนนร้านนั่งดื่มยาวที่สุดในญี่ปุ่น"]}}}},
+  th:{name:"ไทย",en:"Thailand",tz:"Asia/Bangkok",cur:"฿",cities:{
+    bkk:{name:"กรุงเทพฯ",en:"Bangkok",areas:{
+      sukhumvit:["สุขุมวิท / ทองหล่อ","Sukhumvit","โอมากาเสะ คาเฟ่ ร้านไทยร่วมสมัย"],
+      siam:["สยาม / ประตูน้ำ","Siam","ห้างใหญ่ ข้าวมันไก่ บิงซู"],
+      silom:["สีลม / สาทร","Silom","ร้านข้าวออฟฟิศ ซีฟู้ดริมน้ำ"],
+      charoenkrung:["เจริญกรุง / ตลาดน้อย","Charoen Krung","ย่านสร้างสรรค์ริมเจ้าพระยา"],
+      yaowarat:["เยาวราช","Yaowarat","สตรีทฟู้ดกลางคืน อาหารจีน"],
+      banglamphu:["บางลำพู / ข้าวสาร","Banglamphu","ผัดไทย ต้มยำ ร้านดั้งเดิม"],
+      ari:["อารีย์","Ari","ก๋วยเตี๋ยว บรันช์ หมูกระทะ"],
+      chatuchak:["จตุจักร / ลาดพร้าว","Chatuchak","ตลาดนัดเสาร์–อาทิตย์"],
+      ratchada:["รัชดา / ห้วยขวาง","Ratchada","ร้านดึก เล้งแซ่บ โจ๊ก"]}},
+    cnx:{name:"เชียงใหม่",en:"Chiang Mai",areas:{
+      nimman:["นิมมาน","Nimman","ข้าวซอย คาเฟ่ รูฟท็อป"],
+      oldcity:["คูเมือง","Old City","ขันโตก ก๋วยเตี๋ยวกลางคืน"],
+      nightbazaar:["ไนท์บาซาร์ / ช้างคลาน","Night Bazaar","อาหารเหนือ ริมแม่น้ำปิง"],
+      santitham:["สันติธรรม / ช้างเผือก","Santitham","ร้านท้องถิ่น ราคาคนเชียงใหม่"]}}}},
+  kr:{name:"เกาหลีใต้",en:"South Korea",tz:"Asia/Seoul",cur:"₩",cities:{
+    seoul:{name:"โซล",en:"Seoul",areas:{
+      myeongdong:["เมียงดง","Myeongdong","คัลกุกซู ของกินข้างทาง"],
+      hongdae:["ฮงแด / ยอนนัม","Hongdae","ทัคคาลบี บิงซู ร้านดึก"],
+      gangnam:["คังนัม / ซินซา","Gangnam","ฮันอูโอมากาเสะ คาเฟ่การอซูกิล"],
+      seongsu:["ซองซู","Seongsu","โกดังเก่ากลายเป็นคาเฟ่"],
+      itaewon:["อิแทวอน","Itaewon","บาร์บีคิว รูฟท็อป นานาชาติ"],
+      insadong:["อินซาดง / จงโน","Insadong","บ้านโบราณ ซัมกเยทัง ร้านชา"],
+      gwangjang:["ตลาดควังจัง","Gwangjang Market","บินแดต๊อก ยุกฮเว คิมบับ"]}}}}
+};
+const CUISINES = {
+  ramen:["🍜","ราเมง / เส้น"], sushi:["🍣","ซูชิ / โอมากาเสะ"], grill:["🥩","ปิ้งย่าง / ยากินิคุ"],
+  izakaya:["🏮","ร้านนั่งดื่ม / อิซากายะ"], fried:["🍤","เทมปุระ / ทงคัตสึ"], okonomi:["🥞","โอโคโนมิยากิ"],
+  donburi:["🍚","ข้าวหน้า / ดงบุริ"], yoshoku:["🍛","แกงกะหรี่ / โยโชคุ"], fine:["🍽️","ไฟน์ไดนิ่ง"], thai:["🌶️","อาหารไทย"], korean:["🥘","อาหารเกาหลี"], seafood:["🦀","ซีฟู้ด"],
+  street:["🥢","สตรีทฟู้ด"], cafe:["☕","คาเฟ่ / บรันช์"], dessert:["🍧","ของหวาน"]
+};
+const MEALS = [
+  {k:"now",lb:"ตอนนี้",sub:"เวลาท้องถิ่น"},
+  {k:"breakfast",lb:"มื้อเช้า",sub:"08:00",t:"08:00"},
+  {k:"lunch",lb:"มื้อกลางวัน",sub:"12:00",t:"12:00"},
+  {k:"afternoon",lb:"บ่าย / ของว่าง",sub:"15:00",t:"15:00"},
+  {k:"dinner",lb:"มื้อเย็น",sub:"19:00",t:"19:00"},
+  {k:"late",lb:"ดึก",sub:"23:00",t:"23:00"},
+  {k:"any",lb:"ไม่ระบุเวลา",sub:"แสดงทุกร้าน"}
+];
+// พิกัดกลางย่าน (โดยประมาณ)
+const GEO = {
+  shinjuku:[35.6909,139.7003],shibuya:[35.6595,139.7005],harajuku:[35.6702,139.7027],ebisu:[35.6467,139.7101],nakameguro:[35.6441,139.6988],
+  shimokita:[35.6613,139.6680],roppongi:[35.6628,139.7314],ginza:[35.6717,139.7650],marunouchi:[35.6812,139.7671],akihabara:[35.6984,139.7731],
+  ueno:[35.7101,139.7745],asakusa:[35.7118,139.7966],ikebukuro:[35.7295,139.7109],
+  namba:[34.6687,135.5013],shinsaibashi:[34.6724,135.4984],kuromon:[34.6652,135.5068],shinsekai:[34.6525,135.5063],umeda:[34.7025,135.4959],tenma:[34.7045,135.5118],
+  sukhumvit:[13.7246,100.5786],siam:[13.7456,100.5347],silom:[13.7286,100.5340],charoenkrung:[13.7300,100.5140],yaowarat:[13.7398,100.5098],
+  banglamphu:[13.7590,100.4977],ari:[13.7797,100.5446],chatuchak:[13.7999,100.5503],ratchada:[13.7667,100.5697],
+  nimman:[18.7990,98.9676],oldcity:[18.7883,98.9853],nightbazaar:[18.7851,99.0000],santitham:[18.8000,98.9810],
+  myeongdong:[37.5636,126.9860],hongdae:[37.5563,126.9236],gangnam:[37.5163,127.0203],seongsu:[37.5446,127.0559],
+  itaewon:[37.5345,126.9946],insadong:[37.5740,126.9850],gwangjang:[37.5700,126.9996]
+};
+// จุดอ้างอิงที่เลือกเป็นตำแหน่งได้
+const LANDMARKS = {
+  tokyo:[["โรงแรม Hotel Groove Shinjuku",35.6953,139.7010],["สถานีชินจูกุ",35.6896,139.7006],["สถานีโตเกียว",35.6812,139.7671],["แยกชิบูย่า",35.6595,139.7005],["วัดเซ็นโซจิ",35.7148,139.7967],["โตเกียวสกายทรี",35.7101,139.8107],["ศาลเจ้าเมจิ",35.6764,139.6993],["teamLab Planets",35.6491,139.7898]],
+  osaka:[["สถานีนัมบะ",34.6664,135.5003],["สถานีโอซาก้า/อุเมดะ",34.7025,135.4959],["ปราสาทโอซาก้า",34.6873,135.5262],["Universal Studios Japan",34.6654,135.4323]],
+  bkk:[["BTS สยาม",13.7456,100.5341],["BTS อโศก",13.7370,100.5603],["ไอคอนสยาม",13.7267,100.5104],["พระบรมมหาราชวัง",13.7500,100.4913],["สวนจตุจักร",13.8030,100.5530]],
+  cnx:[["ประตูท่าแพ",18.7877,98.9933],["เมญ่า นิมมาน",18.8024,98.9672],["สนามบินเชียงใหม่",18.7668,98.9626]],
+  seoul:[["สถานีโซล",37.5547,126.9707],["พระราชวังคย็องบก",37.5796,126.9770],["N Seoul Tower",37.5512,126.9882],["COEX คังนัม",37.5119,127.0590]]
+};
+function km(a,b){ const R=6371,rad=x=>x*Math.PI/180; const dLa=rad(b[0]-a[0]),dLo=rad(b[1]-a[1]);
+  const h=Math.sin(dLa/2)**2+Math.cos(rad(a[0]))*Math.cos(rad(b[0]))*Math.sin(dLo/2)**2; return 2*R*Math.asin(Math.sqrt(h)); }
+function distTxt(d){ if(d<1) return `${Math.round(d*1000)} ม. · เดิน ${Math.max(1,Math.round(d*1000/80))} นาที`;
+  if(d<=2.5) return `${d.toFixed(1)} กม. · เดิน ${Math.round(d*1000/80)} นาที`; return `${d.toFixed(1)} กม. · รถไฟ/แท็กซี่ ~${Math.round(8+d*3)} นาที`; }
+function parseLoc(s){
+  s = s.trim(); if(!s) return {err:"ยังไม่ได้วางลิงก์หรือพิกัด"};
+  if(/goo\.gl|maps\.app/.test(s)) return {err:"ลิงก์ย่อ (maps.app.goo.gl) อ่านพิกัดไม่ได้ ให้เปิดใน Google Maps แล้วกดค้างที่จุดเพื่อคัดลอกพิกัด เช่น 35.6953, 139.7010"};
+  let m = s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) || s.match(/@(-?\d+\.\d+),\s*(-?\d+\.\d+)/) || s.match(/(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/);
+  if(!m) return {err:"อ่านพิกัดไม่ได้ ลองวางแบบ 35.6953, 139.7010 หรือลิงก์ Google Maps แบบเต็ม"};
+  const lat=+m[1], lng=+m[2];
+  if(Math.abs(lat)>90||Math.abs(lng)>180) return {err:"พิกัดไม่ถูกต้อง"};
+  return {lat,lng};
+}
+function nearestCity(p){
+  let best=null;
+  for(const [co,c] of Object.entries(COUNTRIES)) for(const [ci,cc] of Object.entries(c.cities)) for(const a of Object.keys(cc.areas)){
+    const d=km(p,GEO[a]); if(!best||d<best.d) best={co,ci,d};
+  }
+  return best;
+}
+const DAYS = ["อา.","จ.","อ.","พ.","พฤ.","ศ.","ส."];
+const DAYS_FULL = ["วันอาทิตย์","วันจันทร์","วันอังคาร","วันพุธ","วันพฤหัสฯ","วันศุกร์","วันเสาร์"];
+const RES = {must:["ต้องจองล่วงหน้า","p-bad"],rec:["แนะนำให้จอง","p-warn"],no:["Walk-in ได้","p-ok"]};
+
+// n,name ; c,city ; a,area ; k,cuisines ; r,rating ; v,reviews ; p,price 1-4 ; h,hours ; x,closed days ; t,tel ; rs,reservation ; rn,reservation note ; d,dish ; g,tags
+const R = [
+ // Tokyo
+ {n:"Menya Kagerou",c:"tokyo",a:"shinjuku",k:["ramen"],r:4.6,v:2140,p:1,h:"11:00-23:00",x:[],t:"+81 3-5555-0142",rs:"no",rn:"ตู้กดตั๋วหน้าร้าน",d:"โทนคตสึโชยุ + ไข่ออนเซ็น",g:["เมนูอังกฤษ","คิว ~20 นาที","Suica ได้"]},
+ {n:"Omoide Sumibi",c:"tokyo",a:"shinjuku",k:["izakaya"],r:4.4,v:980,p:2,h:"17:00-00:00",x:[0],t:"+81 3-5555-0187",rs:"rec",rn:"โทร หรือ Tabelog",d:"ยากิโทริถ่าน + ไฮบอล",g:["ที่นั่ง 12 ที่","สูบบุหรี่ได้"]},
+ {n:"Sushi Tsubaki",c:"tokyo",a:"shinjuku",k:["sushi","fine"],r:4.7,v:610,p:4,h:"12:00-14:00,17:30-22:00",x:[3],t:"+81 3-5555-0219",rs:"must",rn:"ผ่านเว็บ Omakase ล่วงหน้า 2–4 สัปดาห์",d:"โอมากาเสะ 18 คำ",g:["เคาน์เตอร์ 8 ที่","บัตรเครดิต"]},
+ {n:"Tonkatsu Maru",c:"tokyo",a:"shinjuku",k:["fried"],r:4.3,v:1320,p:2,h:"11:00-21:30",x:[],t:"+81 3-5555-0266",rs:"no",rn:"",d:"คุโรบุตะโรสุคัตสึ",g:["เมนูอังกฤษ","ใกล้สถานี 3 นาที"]},
+ {n:"Yakiniku Hibana",c:"tokyo",a:"shibuya",k:["grill"],r:4.5,v:1760,p:3,h:"17:00-23:30",x:[],t:"+81 3-5555-0311",rs:"rec",rn:"TableCheck (มีภาษาอังกฤษ)",d:"เนื้อวากิว A5 จัดชุด",g:["ห้องส่วนตัว","บัตรเครดิต"]},
+ {n:"Gyoza Lab Center-gai",c:"tokyo",a:"shibuya",k:["izakaya"],r:4.2,v:2300,p:1,h:"11:30-02:00",x:[],t:"+81 3-5555-0342",rs:"no",rn:"",d:"เกี๊ยวซ่าทอดกรอบ 12 ชิ้น",g:["เปิดดึก","เมนูอังกฤษ"]},
+ {n:"Tomigaya Coffee & Toast",c:"tokyo",a:"shibuya",k:["cafe"],r:4.6,v:890,p:1,h:"07:30-18:00",x:[1],t:"+81 3-5555-0378",rs:"no",rn:"",d:"ชิบูย่าฮันนี่โทสต์",g:["Wi-Fi","ปลั๊กไฟ"]},
+ {n:"Ramen Kuro",c:"tokyo",a:"shibuya",k:["ramen"],r:4.4,v:3100,p:1,h:"10:00-05:00",x:[],t:"+81 3-5555-0391",rs:"no",rn:"ตู้กดตั๋ว",d:"ราเมงน้ำดำ มายุ",g:["เปิดเกือบ 24 ชม.","เงินสด"]},
+ {n:"Tempura Sora",c:"tokyo",a:"asakusa",k:["fried"],r:4.5,v:1450,p:2,h:"11:30-20:00",x:[2],t:"+81 3-5555-0425",rs:"rec",rn:"โทรจองมื้อเย็น",d:"เท็นด้งกุ้งยักษ์",g:["ใกล้วัดเซ็นโซจิ","เมนูอังกฤษ"]},
+ {n:"Melonpan Kobo",c:"tokyo",a:"asakusa",k:["dessert"],r:4.3,v:5200,p:1,h:"09:00-17:00",x:[],t:"+81 3-5555-0448",rs:"no",rn:"",d:"เมลอนปังไส้ไอศกรีม",g:["ซื้อกลับ","คิวสั้น"]},
+ {n:"Monja Hanabi",c:"tokyo",a:"asakusa",k:["okonomi","izakaya"],r:4.2,v:760,p:2,h:"12:00-22:00",x:[],t:"+81 3-5555-0470",rs:"rec",rn:"LINE หรือโทร",d:"มงจายากิชีสเมนไทโกะ",g:["ย่างเองที่โต๊ะ","ครอบครัว"]},
+ {n:"Kappo Shizuku",c:"tokyo",a:"ginza",k:["fine"],r:4.8,v:420,p:4,h:"18:00-23:00",x:[0],t:"+81 3-5555-0512",rs:"must",rn:"ผ่านโรงแรม / Pocket Concierge",d:"ไคเซกิตามฤดูกาล 10 คอร์ส",g:["Dress code","บัตรเครดิต"]},
+ {n:"Sushi Umi Outer Market",c:"tokyo",a:"ginza",k:["sushi","seafood"],r:4.5,v:2600,p:2,h:"07:00-15:00",x:[3],t:"+81 3-5555-0536",rs:"no",rn:"มาก่อน 08:00 คิวสั้น",d:"ชุดซูชิเช้า 10 คำ",g:["ตลาดสึกิจิ","เงินสด"]},
+ {n:"Parfait Hoshi",c:"tokyo",a:"ginza",k:["dessert","cafe"],r:4.6,v:1120,p:2,h:"11:00-20:00",x:[],t:"+81 3-5555-0559",rs:"rec",rn:"จองออนไลน์วันหยุด",d:"พาร์เฟต์ลูกพีชตามฤดู",g:["ถ่ายรูปสวย"]},
+ {n:"Gado-shita Yakitori",c:"tokyo",a:"ginza",k:["izakaya"],r:4.3,v:1900,p:1,h:"16:00-00:00",x:[],t:"+81 3-5555-0581",rs:"no",rn:"",d:"ยากิโทริใต้รางรถไฟ",g:["บรรยากาศท้องถิ่น","เงินสด"]},
+ // Osaka
+ {n:"Tako Hachi Dotonbori",c:"osaka",a:"namba",k:["street"],r:4.4,v:4800,p:1,h:"10:00-23:00",x:[],t:"+81 6-5555-0114",rs:"no",rn:"",d:"ทาโกะยากิซอสดาชิ",g:["ยืนกิน","คิวเร็ว"]},
+ {n:"Okonomiyaki Kaze Hozenji",c:"osaka",a:"namba",k:["okonomi"],r:4.6,v:1350,p:2,h:"11:30-22:00",x:[2],t:"+81 6-5555-0137",rs:"rec",rn:"โทรจองหลัง 18:00",d:"โอโคโนมิยากิหมู-ปลาหมึก",g:["ตรอกโฮเซนจิ","เมนูอังกฤษ"]},
+ {n:"Kushikatsu Tengu",c:"osaka",a:"namba",k:["fried","izakaya"],r:4.3,v:3300,p:1,h:"11:00-22:30",x:[],t:"+81 6-5555-0159",rs:"no",rn:"",d:"คุชิคัตสึรวม 10 ไม้",g:["ห้ามจิ้มซอสซ้ำ","เมนูอังกฤษ"]},
+ {n:"Ramen Tsuru Umeda",c:"osaka",a:"umeda",k:["ramen"],r:4.5,v:1500,p:1,h:"11:00-22:00",x:[],t:"+81 6-5555-0212",rs:"no",rn:"",d:"ชิโอะราเมงหอยลาย",g:["ใกล้สถานี JR"]},
+ {n:"Wagyu Kiwami Kitashinchi",c:"osaka",a:"umeda",k:["grill","fine"],r:4.7,v:700,p:4,h:"17:30-23:00",x:[0],t:"+81 6-5555-0233",rs:"must",rn:"TableCheck ล่วงหน้า 1 สัปดาห์",d:"โกเบบีฟเทปปันยากิ",g:["ห้องส่วนตัว","บัตรเครดิต"]},
+ {n:"Cafe Lumi Grand Front",c:"osaka",a:"umeda",k:["cafe"],r:4.2,v:640,p:2,h:"08:00-21:00",x:[],t:"+81 6-5555-0258",rs:"no",rn:"",d:"แพนเค้กซูเฟล่",g:["Wi-Fi"]},
+ // Bangkok
+ {n:"บ้านในซอย",c:"bkk",a:"sukhumvit",k:["thai"],r:4.6,v:2100,p:2,h:"11:00-22:00",x:[],t:"+66 2-555-0141",rs:"rec",rn:"LINE @baannaisoi",d:"แกงเขียวหวานเนื้อ, ปลาทอดน้ำปลา",g:["ที่จอดรถ","บัตรเครดิต"]},
+ {n:"Kin Omakase Thonglor",c:"bkk",a:"sukhumvit",k:["sushi","fine"],r:4.7,v:380,p:4,h:"18:00-22:30",x:[1],t:"+66 2-555-0162",rs:"must",rn:"มัดจำผ่าน Hungry Hub",d:"โอมากาเสะ 20 คอร์ส",g:["เคาน์เตอร์ 10 ที่"]},
+ {n:"Ekkamai Roastery",c:"bkk",a:"sukhumvit",k:["cafe"],r:4.5,v:1300,p:2,h:"08:00-18:00",x:[],t:"+66 2-555-0184",rs:"no",rn:"",d:"ดริปเมล็ดน่าน + ครัวซองต์",g:["Wi-Fi","ปลั๊กไฟ"]},
+ {n:"ข้าวเหนียวมะม่วงซอย 38",c:"bkk",a:"sukhumvit",k:["dessert","street"],r:4.4,v:2900,p:1,h:"16:00-00:00",x:[],t:"+66 2-555-0199",rs:"no",rn:"",d:"ข้าวเหนียวมะม่วงน้ำดอกไม้",g:["ซื้อกลับ","เงินสด/QR"]},
+ {n:"กะเพราคลับ สีลม",c:"bkk",a:"silom",k:["thai","street"],r:4.3,v:3400,p:1,h:"10:00-21:00",x:[0],t:"+66 2-555-0215",rs:"no",rn:"",d:"กะเพราหมูสับไข่ดาวเยิ้ม",g:["ใกล้ BTS ศาลาแดง","QR"]},
+ {n:"Sathorn Seafood Pier",c:"bkk",a:"silom",k:["seafood","thai"],r:4.5,v:1850,p:3,h:"16:00-23:00",x:[],t:"+66 2-555-0238",rs:"rec",rn:"โทรจองโต๊ะริมน้ำ",d:"ปูผัดผงกะหรี่, กุ้งแม่น้ำเผา",g:["ริมแม่น้ำ","ที่จอดรถ"]},
+ {n:"ข้าวมันไก่ซอยคอนแวนต์",c:"bkk",a:"silom",k:["street","thai"],r:4.6,v:4100,p:1,h:"06:00-14:00",x:[],t:"+66 2-555-0257",rs:"no",rn:"",d:"ข้าวมันไก่ผสม + น้ำซุป",g:["เช้าคิวยาว","เงินสด"]},
+ {n:"ก๋วยจั๊บน้ำข้นรวย",c:"bkk",a:"yaowarat",k:["street"],r:4.5,v:6200,p:1,h:"18:00-01:00",x:[1],t:"+66 2-555-0311",rs:"no",rn:"",d:"ก๋วยจั๊บน้ำข้นพริกไทย",g:["คิว ~30 นาที","เงินสด"]},
+ {n:"ไข่เจียวปูเจ๊เล็ก",c:"bkk",a:"yaowarat",k:["seafood","thai"],r:4.4,v:2700,p:2,h:"17:00-00:00",x:[],t:"+66 2-555-0334",rs:"rec",rn:"โทรจองวันศุกร์–เสาร์",d:"ไข่เจียวปู, ผัดขี้เมาทะเล",g:["รับบัตร"]},
+ {n:"ขนมปังนึ่งแปลงนาม",c:"bkk",a:"yaowarat",k:["dessert"],r:4.6,v:3800,p:1,h:"17:30-00:30",x:[],t:"+66 2-555-0356",rs:"no",rn:"",d:"ขนมปังนึ่งสังขยาใบเตย",g:["ซื้อกลับ"]},
+ {n:"ก๋วยเตี๋ยวเรืออารีย์",c:"bkk",a:"ari",k:["thai","street","ramen"],r:4.4,v:1600,p:1,h:"09:00-17:00",x:[],t:"+66 2-555-0412",rs:"no",rn:"",d:"เส้นเล็กน้ำตกหมู",g:["ใกล้ BTS อารีย์"]},
+ {n:"Ari Brunch House",c:"bkk",a:"ari",k:["cafe"],r:4.5,v:990,p:2,h:"08:00-16:00",x:[2],t:"+66 2-555-0433",rs:"rec",rn:"จองผ่าน IG เสาร์–อาทิตย์",d:"Eggs benedict ปูนิ่ม",g:["เป็นมิตรกับสัตว์เลี้ยง"]},
+ {n:"หมูกระทะซอยอารีย์",c:"bkk",a:"ari",k:["grill","thai"],r:4.3,v:1200,p:2,h:"16:00-00:00",x:[],t:"+66 2-555-0457",rs:"no",rn:"",d:"หมูกระทะบุฟเฟต์",g:["กลุ่มใหญ่","QR"]},
+ // Chiang Mai
+ {n:"ข้าวซอยแม่นิมมาน",c:"cnx",a:"nimman",k:["thai","ramen"],r:4.7,v:5100,p:1,h:"08:00-16:00",x:[],t:"+66 53-555-0118",rs:"no",rn:"",d:"ข้าวซอยไก่น่องใหญ่",g:["คิวเที่ยง","เงินสด/QR"]},
+ {n:"One Nimman Pour Over",c:"cnx",a:"nimman",k:["cafe"],r:4.5,v:1400,p:2,h:"08:00-20:00",x:[],t:"+66 53-555-0139",rs:"no",rn:"",d:"ดริปกาแฟดอยช้าง",g:["Wi-Fi"]},
+ {n:"Maya Hill Grill",c:"cnx",a:"nimman",k:["grill"],r:4.2,v:800,p:2,h:"17:00-23:00",x:[],t:"+66 53-555-0152",rs:"rec",rn:"โทรจองกลุ่ม 6+",d:"หมูย่างเกาหลีดาดฟ้า",g:["วิวดาดฟ้า"]},
+ {n:"ขันโตกท่าแพ",c:"cnx",a:"oldcity",k:["thai"],r:4.4,v:1200,p:3,h:"18:00-22:00",x:[],t:"+66 53-555-0214",rs:"rec",rn:"จองรอบโชว์ 19:00",d:"ขันโตก + ฟ้อนเล็บ",g:["มีโชว์","ครอบครัว"]},
+ {n:"ก๋วยเตี๋ยวกลางคืนวัดพระสิงห์",c:"cnx",a:"oldcity",k:["street","ramen"],r:4.5,v:2200,p:1,h:"17:00-23:00",x:[],t:"+66 53-555-0236",rs:"no",rn:"",d:"เส้นใหญ่ต้มยำหมูตุ๋น",g:["เงินสด"]},
+ {n:"เค้กมะพร้าวคูเมือง",c:"cnx",a:"oldcity",k:["dessert","cafe"],r:4.6,v:900,p:1,h:"10:00-18:00",x:[1],t:"+66 53-555-0259",rs:"no",rn:"",d:"เค้กมะพร้าวอ่อน",g:["ซื้อกลับ"]},
+ // Seoul
+ {n:"Myeongdong Kalguksu Jip",c:"seoul",a:"myeongdong",k:["korean","ramen"],r:4.5,v:7200,p:1,h:"10:30-21:00",x:[],t:"+82 2-555-0117",rs:"no",rn:"",d:"คัลกุกซู + มันดู",g:["เมนูไทย/อังกฤษ","คิวเร็ว"]},
+ {n:"Namsan Hanu Grill",c:"seoul",a:"myeongdong",k:["grill","korean"],r:4.6,v:1300,p:3,h:"11:30-22:00",x:[],t:"+82 2-555-0138",rs:"rec",rn:"CatchTable",d:"ฮันอูชาดอลแบกี",g:["พนักงานย่างให้"]},
+ {n:"Hotteok Alley",c:"seoul",a:"myeongdong",k:["street","dessert"],r:4.2,v:3900,p:1,h:"12:00-22:00",x:[],t:"+82 2-555-0159",rs:"no",rn:"",d:"ฮอตต๊อกเมล็ดพืช",g:["ยืนกิน","เงินสด"]},
+ {n:"Dakgalbi Bom",c:"seoul",a:"hongdae",k:["korean"],r:4.4,v:2400,p:2,h:"11:00-01:00",x:[],t:"+82 2-555-0213",rs:"no",rn:"",d:"ทัคคาลบีชีสฟองดู",g:["กลุ่มใหญ่","เปิดดึก"]},
+ {n:"Yeonnam Bingsu Room",c:"seoul",a:"hongdae",k:["dessert","cafe"],r:4.6,v:1700,p:1,h:"12:00-22:00",x:[],t:"+82 2-555-0235",rs:"no",rn:"",d:"บิงซูถั่วแดงนมสด",g:["ถ่ายรูปสวย"]},
+ {n:"Hongdae Pocha Night",c:"seoul",a:"hongdae",k:["izakaya","korean"],r:4.3,v:1100,p:2,h:"18:00-04:00",x:[],t:"+82 2-555-0257",rs:"no",rn:"",d:"ต๊อกบกกี + โซจู",g:["เปิดดึก"]},
+ // Tokyo (เพิ่ม)
+ {n:"Kaisendon Taro Ameyoko",c:"tokyo",a:"ueno",k:["donburi","seafood"],r:4.4,v:3500,p:1,h:"10:00-19:00",x:[],t:"+81 3-5555-0611",rs:"no",rn:"",d:"ไคเซ็นด้งทูน่า 3 ส่วน",g:["ตลาดอาเมโยโกะ","เงินสด"]},
+ {n:"Tonkatsu Hoshino",c:"tokyo",a:"ueno",k:["fried"],r:4.6,v:1800,p:2,h:"11:00-15:00,17:00-21:00",x:[1],t:"+81 3-5555-0634",rs:"no",rn:"",d:"ฮิเระคัตสึสันในหมู",g:["ร้านเก่าแก่","คิวเที่ยง"]},
+ {n:"Standing Bar Ken",c:"tokyo",a:"ueno",k:["izakaya"],r:4.2,v:1400,p:1,h:"12:00-23:00",x:[],t:"+81 3-5555-0657",rs:"no",rn:"",d:"โมสึนิโคมิ + เลมอนซาวะ",g:["ยืนดื่ม","เงินสด"]},
+ {n:"Ramen Tatsu Ikebukuro",c:"tokyo",a:"ikebukuro",k:["ramen"],r:4.6,v:4200,p:1,h:"10:30-04:00",x:[],t:"+81 3-5555-0712",rs:"no",rn:"ตู้กดตั๋ว",d:"ราเมงหมูชาชูแผ่นหนา",g:["เปิดดึก","คิว ~30 นาที"]},
+ {n:"Omurice-tei Sunshine",c:"tokyo",a:"ikebukuro",k:["yoshoku"],r:4.3,v:900,p:1,h:"11:00-21:00",x:[],t:"+81 3-5555-0735",rs:"no",rn:"",d:"ข้าวห่อไข่ซอสเดมิกลาส",g:["ครอบครัว","เมนูรูปภาพ"]},
+ {n:"Yakiniku Gen",c:"tokyo",a:"ikebukuro",k:["grill"],r:4.4,v:1100,p:2,h:"16:00-00:00",x:[],t:"+81 3-5555-0758",rs:"rec",rn:"Hot Pepper Gourmet",d:"บุฟเฟต์ยากินิคุ 90 นาที",g:["กลุ่มใหญ่"]},
+ {n:"Azabu Soba Kiyoshi",c:"tokyo",a:"roppongi",k:["ramen"],r:4.5,v:700,p:2,h:"11:30-15:00,17:30-21:00",x:[0],t:"+81 3-5555-0813",rs:"no",rn:"",d:"เซย์โระโซบะเส้นสด",g:["ร้านเก่าแก่"]},
+ {n:"Teppan Akari Roppongi",c:"tokyo",a:"roppongi",k:["grill","fine"],r:4.6,v:520,p:4,h:"17:30-23:00",x:[],t:"+81 3-5555-0836",rs:"must",rn:"Omakase ล่วงหน้า 1 สัปดาห์",d:"เทปปันยากิวากิวมัตสึซากะ",g:["วิวเมือง","บัตรเครดิต"]},
+ {n:"Hills Bakery Terrace",c:"tokyo",a:"roppongi",k:["cafe"],r:4.3,v:800,p:2,h:"08:00-20:00",x:[],t:"+81 3-5555-0859",rs:"no",rn:"",d:"ครัวซองต์มัทฉะ",g:["Wi-Fi"]},
+ {n:"Ramen Kasumi Ebisu",c:"tokyo",a:"ebisu",k:["ramen"],r:4.5,v:2600,p:1,h:"11:00-23:00",x:[],t:"+81 3-5555-0914",rs:"no",rn:"ตู้กดตั๋ว",d:"ชิโอะราเมงส้มยูซุ",g:["มีเมนูวีแกน","เมนูอังกฤษ"]},
+ {n:"Yokocho Hachi",c:"tokyo",a:"ebisu",k:["izakaya"],r:4.3,v:1500,p:2,h:"17:00-02:00",x:[],t:"+81 3-5555-0937",rs:"no",rn:"",d:"ซาชิมิรวม + ฮอปปี",g:["ตรอกโยโกโจ","เปิดดึก"]},
+ {n:"Daikanyama Sweets Lab",c:"tokyo",a:"ebisu",k:["dessert"],r:4.5,v:780,p:2,h:"10:00-19:00",x:[2],t:"+81 3-5555-0958",rs:"no",rn:"",d:"ชีสเค้กญี่ปุ่นเนื้อนุ่ม",g:["ซื้อกลับ"]},
+ {n:"Crepe Momo Takeshita",c:"tokyo",a:"harajuku",k:["dessert","street"],r:4.3,v:4100,p:1,h:"10:00-20:00",x:[],t:"+81 3-5555-1012",rs:"no",rn:"",d:"เครปสตรอว์เบอร์รีชีสเค้ก",g:["ถนนทาเคชิตะ","ยืนกิน"]},
+ {n:"Gyukatsu Rin Omotesando",c:"tokyo",a:"harajuku",k:["fried"],r:4.5,v:2300,p:2,h:"11:00-22:00",x:[],t:"+81 3-5555-1035",rs:"no",rn:"สแกน QR รับคิว",d:"กิวคัตสึย่างบนหินร้อน",g:["เมนูอังกฤษ","คิว ~40 นาที"]},
+ {n:"Aoyama Pancake Room",c:"tokyo",a:"harajuku",k:["cafe","dessert"],r:4.4,v:1600,p:2,h:"09:00-19:00",x:[],t:"+81 3-5555-1058",rs:"rec",rn:"จองออนไลน์วันหยุด",d:"แพนเค้กริคอตต้า",g:["ถ่ายรูปสวย"]},
+ {n:"Akiba Curry Go",c:"tokyo",a:"akihabara",k:["yoshoku"],r:4.4,v:2900,p:1,h:"10:30-22:00",x:[],t:"+81 3-5555-1113",rs:"no",rn:"",d:"แกงกะหรี่คัตสึชีส",g:["ร้านเร็ว","เมนูอังกฤษ"]},
+ {n:"Kanda Soba Matsu",c:"tokyo",a:"akihabara",k:["ramen"],r:4.6,v:1500,p:2,h:"11:00-20:00",x:[0],t:"+81 3-5555-1136",rs:"no",rn:"",d:"คาโมะนัมบันโซบะเป็ด",g:["ร้านเก่าแก่"]},
+ {n:"Gyudon Tetsu",c:"tokyo",a:"akihabara",k:["donburi"],r:4.2,v:2000,p:1,h:"07:00-23:00",x:[],t:"+81 3-5555-1159",rs:"no",rn:"",d:"กิวด้งเนื้อซอสหวาน",g:["เปิดเช้า","ราคาถูก"]},
+ {n:"Soup Curry Kobo",c:"tokyo",a:"shimokita",k:["yoshoku"],r:4.6,v:1900,p:2,h:"11:30-22:00",x:[],t:"+81 3-5555-1214",rs:"no",rn:"",d:"ซุปแกงกะหรี่ผัก 20 ชนิด",g:["เลือกระดับเผ็ด","มีเมนูมังสวิรัติ"]},
+ {n:"Shimokita Coffee Hut",c:"tokyo",a:"shimokita",k:["cafe"],r:4.5,v:700,p:1,h:"09:00-20:00",x:[],t:"+81 3-5555-1237",rs:"no",rn:"",d:"ดริปเมล็ดคั่วอ่อน",g:["ปลั๊กไฟ"]},
+ {n:"Oden Bar Shimokita",c:"tokyo",a:"shimokita",k:["izakaya"],r:4.3,v:520,p:2,h:"18:00-01:00",x:[1],t:"+81 3-5555-1258",rs:"rec",rn:"โทรจอง",d:"โอเด้งน้ำดาชิ + สาเกอุ่น",g:["เคาน์เตอร์ 10 ที่"]},
+ {n:"Tsukemen Iki Ramen Street",c:"tokyo",a:"marunouchi",k:["ramen"],r:4.5,v:5600,p:1,h:"07:30-22:30",x:[],t:"+81 3-5555-1313",rs:"no",rn:"ตู้กดตั๋ว",d:"ซึเคเม็งน้ำซุปเข้มข้น",g:["ใต้สถานีโตเกียว","เปิดเช้า"]},
+ {n:"Unagi Fuji Marunouchi",c:"tokyo",a:"marunouchi",k:["donburi"],r:4.6,v:1100,p:3,h:"11:00-14:30,17:00-21:30",x:[],t:"+81 3-5555-1336",rs:"rec",rn:"TableCheck",d:"อุนาจูปลาไหลย่าง",g:["บัตรเครดิต"]},
+ {n:"Kaitenzushi Nami KITTE",c:"tokyo",a:"marunouchi",k:["sushi"],r:4.4,v:3200,p:2,h:"11:00-22:00",x:[],t:"+81 3-5555-1359",rs:"no",rn:"รับบัตรคิวหน้าร้าน",d:"ซูชิสายพาน ปลาจากโฮคุริคุ",g:["คิว ~45 นาที"]},
+ {n:"Meguro River Coffee",c:"tokyo",a:"nakameguro",k:["cafe"],r:4.5,v:1200,p:2,h:"08:00-19:00",x:[],t:"+81 3-5555-1414",rs:"no",rn:"",d:"ลาเต้ + ขนมปังโฮจิฉะ",g:["ริมคลอง"]},
+ {n:"Izakaya Sen Nakameguro",c:"tokyo",a:"nakameguro",k:["izakaya"],r:4.5,v:640,p:2,h:"17:30-00:00",x:[0],t:"+81 3-5555-1437",rs:"rec",rn:"โทร หรือ Tabelog",d:"ปลาย่างถ่าน + สาเก",g:["บรรยากาศท้องถิ่น"]},
+ {n:"Yakitori Tori-Ichi",c:"tokyo",a:"nakameguro",k:["grill","izakaya"],r:4.6,v:480,p:3,h:"17:00-23:00",x:[3],t:"+81 3-5555-1458",rs:"must",rn:"โทรจองล่วงหน้า 1 เดือน",d:"ยากิโทริไก่ดำ 12 ไม้",g:["เคาน์เตอร์ 9 ที่"]},
+ // Osaka (เพิ่ม)
+ {n:"Cheesecake Oji Shinsaibashi",c:"osaka",a:"shinsaibashi",k:["dessert"],r:4.4,v:3800,p:1,h:"09:00-21:00",x:[],t:"+81 6-5555-0311",rs:"no",rn:"",d:"ชีสเค้กอบใหม่ทุกชั่วโมง",g:["ซื้อกลับ"]},
+ {n:"Ramen Kiba Amemura",c:"osaka",a:"shinsaibashi",k:["ramen"],r:4.3,v:1700,p:1,h:"11:00-02:00",x:[],t:"+81 6-5555-0334",rs:"no",rn:"",d:"ราเมงไก่ข้นครีมมี่",g:["เปิดดึก"]},
+ {n:"Kappo Aoi",c:"osaka",a:"shinsaibashi",k:["fine"],r:4.7,v:300,p:4,h:"18:00-22:30",x:[0],t:"+81 6-5555-0357",rs:"must",rn:"ผ่านโรงแรม ล่วงหน้า 2 สัปดาห์",d:"คัปโปะ 9 คอร์ส",g:["Dress code"]},
+ {n:"Kuromon Uni Stand",c:"osaka",a:"kuromon",k:["seafood","street"],r:4.4,v:2900,p:2,h:"08:00-17:00",x:[],t:"+81 6-5555-0412",rs:"no",rn:"",d:"หอยเม่นสด + หอยนางรมย่าง",g:["ยืนกิน","ในตลาด"]},
+ {n:"Fugu Shun Kuromon",c:"osaka",a:"kuromon",k:["seafood","fine"],r:4.5,v:600,p:3,h:"11:00-22:00",x:[],t:"+81 6-5555-0435",rs:"rec",rn:"TableCheck",d:"เทชชิริชาบูปลาปักเป้า",g:["ห้องส่วนตัว"]},
+ {n:"Kaisendon Kai Nippombashi",c:"osaka",a:"kuromon",k:["donburi","seafood"],r:4.3,v:1300,p:2,h:"09:00-16:00",x:[3],t:"+81 6-5555-0458",rs:"no",rn:"",d:"ไคเซ็นด้ง 12 หน้า",g:["เปิดเช้า"]},
+ {n:"Kushikatsu Hiro Shinsekai",c:"osaka",a:"shinsekai",k:["fried","izakaya"],r:4.4,v:2500,p:1,h:"11:00-22:30",x:[],t:"+81 6-5555-0513",rs:"no",rn:"",d:"คุชิคัตสึเนื้อ + เบียร์",g:["ห้ามจิ้มซอสซ้ำ"]},
+ {n:"Doteyaki Tomo",c:"osaka",a:"shinsekai",k:["izakaya"],r:4.2,v:900,p:1,h:"10:00-21:00",x:[],t:"+81 6-5555-0536",rs:"no",rn:"",d:"โดเทะยากิเนื้อตุ๋นมิโซะ",g:["ร้านเก่าแก่","เงินสด"]},
+ {n:"Takoyaki Ichi Tsutenkaku",c:"osaka",a:"shinsekai",k:["street"],r:4.3,v:1200,p:1,h:"10:00-20:00",x:[],t:"+81 6-5555-0559",rs:"no",rn:"",d:"ทาโกะยากิโรยต้นหอม",g:["ใต้หอสึเทนคาคุ"]},
+ {n:"Sushi Sen Tenjinbashi",c:"osaka",a:"tenma",k:["sushi"],r:4.5,v:3000,p:1,h:"10:30-21:30",x:[],t:"+81 6-5555-0614",rs:"no",rn:"",d:"ซูชิคำโต ราคาย่อมเยา",g:["คิว ~30 นาที"]},
+ {n:"Horumon Taki Tenma",c:"osaka",a:"tenma",k:["grill"],r:4.4,v:800,p:1,h:"17:00-00:00",x:[],t:"+81 6-5555-0637",rs:"no",rn:"",d:"ฮอร์โมนย่างถ่าน",g:["บรรยากาศท้องถิ่น"]},
+ {n:"Sake Stand Mori",c:"osaka",a:"tenma",k:["izakaya"],r:4.5,v:650,p:1,h:"15:00-23:00",x:[0],t:"+81 6-5555-0658",rs:"no",rn:"",d:"สาเกท้องถิ่น 30 ชนิด",g:["ยืนดื่ม"]},
+ // Bangkok (เพิ่ม)
+ {n:"ข้าวมันไก่ประตูน้ำเขียว",c:"bkk",a:"siam",k:["street","thai"],r:4.4,v:5800,p:1,h:"05:30-15:00,17:00-02:00",x:[],t:"+66 2-555-0512",rs:"no",rn:"",d:"ข้าวมันไก่ต้ม + เลือดไก่",g:["เปิดดึก","เงินสด/QR"]},
+ {n:"Paragon Thai Kitchen",c:"bkk",a:"siam",k:["thai"],r:4.3,v:2200,p:3,h:"10:00-22:00",x:[],t:"+66 2-555-0535",rs:"rec",rn:"Hungry Hub",d:"ต้มยำกุ้งน้ำข้น, แกงมัสมั่น",g:["ในห้าง","บัตรเครดิต"]},
+ {n:"Bingsu After Siam Square",c:"bkk",a:"siam",k:["dessert","cafe"],r:4.5,v:1900,p:2,h:"11:00-22:00",x:[],t:"+66 2-555-0558",rs:"no",rn:"",d:"บิงซูชาไทย",g:["ใกล้ BTS สยาม"]},
+ {n:"Charoenkrung Bistro 1908",c:"bkk",a:"charoenkrung",k:["fine","thai"],r:4.6,v:520,p:4,h:"18:00-23:00",x:[1],t:"+66 2-555-0613",rs:"must",rn:"มัดจำผ่านเว็บร้าน",d:"อาหารไทยโบราณ 8 คอร์ส",g:["ตึกเก่า","บัตรเครดิต"]},
+ {n:"Talad Noi Coffee Garage",c:"bkk",a:"charoenkrung",k:["cafe"],r:4.5,v:1700,p:2,h:"08:00-18:00",x:[],t:"+66 2-555-0636",rs:"no",rn:"",d:"เอสเปรสโซโทนิก",g:["ถ่ายรูปสวย"]},
+ {n:"ข้าวต้มปลาเจริญกรุง",c:"bkk",a:"charoenkrung",k:["thai","seafood"],r:4.5,v:3300,p:1,h:"16:00-02:00",x:[],t:"+66 2-555-0659",rs:"no",rn:"",d:"ข้าวต้มปลากะพง",g:["เปิดดึก"]},
+ {n:"ผัดไทยห่อไข่มหรรณพ",c:"bkk",a:"banglamphu",k:["thai","street"],r:4.5,v:6800,p:1,h:"09:00-00:00",x:[2],t:"+66 2-555-0714",rs:"no",rn:"",d:"ผัดไทยกุ้งสดห่อไข่",g:["คิว ~20 นาที"]},
+ {n:"ต้มยำน้ำข้นบางลำพู",c:"bkk",a:"banglamphu",k:["thai","ramen"],r:4.4,v:2000,p:1,h:"10:00-20:00",x:[],t:"+66 2-555-0737",rs:"no",rn:"",d:"ก๋วยเตี๋ยวต้มยำกุ้งน้ำข้น",g:["ร้านเก่าแก่"]},
+ {n:"Khao San Rooftop Grill",c:"bkk",a:"banglamphu",k:["izakaya","grill"],r:4.1,v:1500,p:2,h:"16:00-02:00",x:[],t:"+66 2-555-0758",rs:"no",rn:"",d:"ซี่โครงหมูย่าง + ค็อกเทล",g:["รูฟท็อป","ดนตรีสด"]},
+ {n:"Paella Stand JJ",c:"bkk",a:"chatuchak",k:["street"],r:4.4,v:2600,p:1,h:"09:00-18:00",x:[1,2,3,4,5],t:"+66 2-555-0813",rs:"no",rn:"",d:"ปาเอญ่ากระทะยักษ์",g:["เฉพาะเสาร์–อาทิตย์"]},
+ {n:"ส้มตำตลาดนัดจตุจักร",c:"bkk",a:"chatuchak",k:["thai","street"],r:4.3,v:1400,p:1,h:"08:00-18:00",x:[],t:"+66 2-555-0836",rs:"no",rn:"",d:"ตำปูปลาร้า + คอหมูย่าง",g:["เงินสด/QR"]},
+ {n:"Lat Phrao Tonkotsu",c:"bkk",a:"chatuchak",k:["ramen"],r:4.5,v:900,p:2,h:"11:00-21:00",x:[],t:"+66 2-555-0859",rs:"no",rn:"",d:"ราเมงทงคตสึน้ำข้น",g:["ใกล้ MRT ลาดพร้าว"]},
+ {n:"เล้งแซ่บภูเขาไฟ",c:"bkk",a:"ratchada",k:["thai","street"],r:4.3,v:4400,p:2,h:"17:00-00:00",x:[],t:"+66 2-555-0914",rs:"no",rn:"",d:"เล้งแซ่บกองโต",g:["กลุ่มใหญ่"]},
+ {n:"โจ๊กหมูห้วยขวาง",c:"bkk",a:"ratchada",k:["thai"],r:4.4,v:1800,p:1,h:"05:00-11:00,17:00-02:00",x:[],t:"+66 2-555-0937",rs:"no",rn:"",d:"โจ๊กหมูสับไข่เยี่ยวม้า",g:["เปิดเช้าและดึก"]},
+ {n:"Jin Korean BBQ Ratchada",c:"bkk",a:"ratchada",k:["grill","korean"],r:4.4,v:1200,p:2,h:"11:00-23:00",x:[],t:"+66 2-555-0958",rs:"rec",rn:"LINE",d:"หมูสามชั้นย่าง",g:["ใกล้ MRT"]},
+ // Chiang Mai (เพิ่ม)
+ {n:"ไส้อั่วลุงหนาน",c:"cnx",a:"nightbazaar",k:["street","thai"],r:4.4,v:1300,p:1,h:"17:00-23:00",x:[],t:"+66 53-555-0311",rs:"no",rn:"",d:"ไส้อั่ว + น้ำพริกหนุ่ม",g:["ตลาดกลางคืน"]},
+ {n:"Ping River Grill House",c:"cnx",a:"nightbazaar",k:["grill","seafood"],r:4.3,v:900,p:3,h:"17:00-23:00",x:[],t:"+66 53-555-0334",rs:"rec",rn:"โทรจองโต๊ะริมน้ำ",d:"กุ้งแม่น้ำเผา",g:["ริมแม่น้ำปิง"]},
+ {n:"ขนมจีนน้ำเงี้ยวแม่ศรี",c:"cnx",a:"nightbazaar",k:["thai"],r:4.6,v:1100,p:1,h:"07:00-14:00",x:[0],t:"+66 53-555-0357",rs:"no",rn:"",d:"ขนมจีนน้ำเงี้ยว",g:["เปิดเช้า"]},
+ {n:"ขาหมูหน้าประตูช้างเผือก",c:"cnx",a:"santitham",k:["street","thai"],r:4.5,v:3200,p:1,h:"17:00-00:00",x:[],t:"+66 53-555-0412",rs:"no",rn:"",d:"ข้าวขาหมูหนังนุ่ม",g:["คิวหัวค่ำ"]},
+ {n:"Santitham Slow Bar",c:"cnx",a:"santitham",k:["cafe"],r:4.6,v:600,p:2,h:"09:00-17:00",x:[2],t:"+66 53-555-0435",rs:"no",rn:"",d:"ดริปกาแฟดอยสะเก็ด",g:["เงียบ ทำงานได้"]},
+ {n:"ลาบคั่วสันติธรรม",c:"cnx",a:"santitham",k:["thai"],r:4.4,v:850,p:1,h:"10:00-20:00",x:[],t:"+66 53-555-0458",rs:"no",rn:"",d:"ลาบคั่วเหนือ + แคบหมู",g:["รสจัด"]},
+ // Seoul (เพิ่ม)
+ {n:"Garosu Bakery House",c:"seoul",a:"gangnam",k:["cafe","dessert"],r:4.5,v:2100,p:2,h:"08:00-22:00",x:[],t:"+82 2-555-0311",rs:"no",rn:"",d:"ครัวซองต์เนยเกาหลี",g:["ถนนการอซูกิล"]},
+ {n:"Hanu Omakase Seol",c:"seoul",a:"gangnam",k:["grill","fine"],r:4.7,v:450,p:4,h:"17:30-23:00",x:[0],t:"+82 2-555-0334",rs:"must",rn:"CatchTable ล่วงหน้า 2 สัปดาห์",d:"ฮันอู 1++ 12 คอร์ส",g:["ห้องส่วนตัว"]},
+ {n:"Gamjatang 24 Sinsa",c:"seoul",a:"gangnam",k:["korean"],r:4.4,v:1900,p:1,h:"00:00-24:00",x:[],t:"+82 2-555-0357",rs:"no",rn:"",d:"คัมจาทังกระดูกหมู",g:["24 ชั่วโมง"]},
+ {n:"Seongsu Warehouse Coffee",c:"seoul",a:"seongsu",k:["cafe"],r:4.5,v:3200,p:2,h:"09:00-22:00",x:[],t:"+82 2-555-0412",rs:"no",rn:"",d:"ลาเต้ครีมงาดำ",g:["โกดังเก่า"]},
+ {n:"Salt Bread Lab",c:"seoul",a:"seongsu",k:["dessert"],r:4.6,v:2600,p:1,h:"08:00-19:00",x:[],t:"+82 2-555-0435",rs:"no",rn:"",d:"ขนมปังเกลือเนยสด",g:["หมดไว มาเช้า"]},
+ {n:"Gopchang Alley Seongsu",c:"seoul",a:"seongsu",k:["grill","korean"],r:4.3,v:1100,p:2,h:"16:00-01:00",x:[],t:"+82 2-555-0458",rs:"no",rn:"",d:"ไส้วัวย่าง + ข้าวผัดก้นกระทะ",g:["เปิดดึก"]},
+ {n:"Itaewon Smoke Pit",c:"seoul",a:"itaewon",k:["grill"],r:4.4,v:1300,p:2,h:"11:30-23:00",x:[],t:"+82 2-555-0513",rs:"rec",rn:"CatchTable",d:"บริสเก็ตรมควัน 12 ชม.",g:["เมนูอังกฤษ"]},
+ {n:"Haebangchon Rooftop Pub",c:"seoul",a:"itaewon",k:["izakaya"],r:4.3,v:800,p:2,h:"17:00-02:00",x:[],t:"+82 2-555-0536",rs:"no",rn:"",d:"ไก่ทอดเกาหลี + คราฟต์เบียร์",g:["วิวนัมซานทาวเวอร์"]},
+ {n:"Kimchi Jjigae Halmoni",c:"seoul",a:"itaewon",k:["korean"],r:4.5,v:2300,p:1,h:"07:00-21:00",x:[],t:"+82 2-555-0559",rs:"no",rn:"",d:"คิมจิจิเก + ไข่ม้วน",g:["เปิดเช้า"]},
+ {n:"Insadong Tea House Dal",c:"seoul",a:"insadong",k:["cafe","dessert"],r:4.6,v:1400,p:1,h:"10:00-21:00",x:[],t:"+82 2-555-0613",rs:"no",rn:"",d:"ชาพุทราจีน + ต๊อกโบราณ",g:["บ้านฮันอก"]},
+ {n:"Samgyetang Won Jongno",c:"seoul",a:"insadong",k:["korean"],r:4.5,v:5100,p:2,h:"10:00-22:00",x:[1],t:"+82 2-555-0636",rs:"no",rn:"",d:"ซัมกเยทังไก่ตุ๋นโสม",g:["คิวเที่ยง","เมนูไทย"]},
+ {n:"Ikseondong Hanok Bistro",c:"seoul",a:"insadong",k:["fine","korean"],r:4.4,v:900,p:3,h:"11:30-22:00",x:[],t:"+82 2-555-0659",rs:"rec",rn:"CatchTable",d:"ฮันจองชิกร่วมสมัย",g:["บ้านฮันอก"]},
+ {n:"Bindaetteok Halmae",c:"seoul",a:"gwangjang",k:["street","korean"],r:4.5,v:8400,p:1,h:"09:00-22:00",x:[],t:"+82 2-555-0714",rs:"no",rn:"",d:"บินแดต๊อกถั่วเขียว + มักกอลลี",g:["ในตลาด","เงินสด"]},
+ {n:"Yukhoe Alley Jin",c:"seoul",a:"gwangjang",k:["korean","seafood"],r:4.6,v:3700,p:2,h:"10:00-22:00",x:[],t:"+82 2-555-0737",rs:"no",rn:"",d:"ยุกฮเวเนื้อดิบ + หนวดปลาหมึกสด",g:["คิว ~30 นาที"]},
+ {n:"Mayak Kimbap Stall",c:"seoul",a:"gwangjang",k:["street"],r:4.3,v:5300,p:1,h:"08:00-21:00",x:[],t:"+82 2-555-0758",rs:"no",rn:"",d:"คิมบับมินิจิ้มมัสตาร์ด",g:["ยืนกิน"]}
+];
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const toMin = s => { const [h,m] = s.split(":").map(Number); return h*60+m; };
+const cityOf = (co,ci) => COUNTRIES[co].cities[ci];
+const C_MEAN = 4.3, M_WEIGHT = 300;
+const smart = x => (x.v/(x.v+M_WEIGHT))*x.r + (M_WEIGHT/(x.v+M_WEIGHT))*C_MEAN;
+
+function localNow(tz){
+  const parts = new Intl.DateTimeFormat("en-US",{timeZone:tz,weekday:"short",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(new Date());
+  const get = t => parts.find(p=>p.type===t).value;
+  const wd = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(get("weekday"));
+  let h = +get("hour"); if(h===24) h=0;
+  return {day:wd,min:h*60+ +get("minute")};
+}
+// returns {open:bool, closesIn:min|null}
+function openAt(x,day,min){
+  const prev = (day+6)%7;
+  for(const seg of x.h.split(",")){
+    const [s,e] = seg.split("-").map(toMin);
+    if(e>s){ if(!x.x.includes(day) && min>=s && min<e) return {open:true,left:e-min}; }
+    else { // overnight
+      if(!x.x.includes(day) && min>=s) return {open:true,left:1440-min+e};
+      if(!x.x.includes(prev) && min<e) return {open:true,left:e-min};
+    }
+  }
+  return {open:false};
+}
+function hhmm(m){ m=((m%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0"); }
+
+/* ---------- state ---------- */
+const S = {step:0,country:null,city:null,area:null,cuisines:[],day:null,meal:null,sort:"smart",minR:0,resOnly:false,openOnly:false,loc:null,radius:2,locErr:"",locMove:null};
+let favs = new Set(), myAreas = [];
+try{ favs = new Set(JSON.parse(localStorage.getItem("kd-favs")||"[]")); }catch(e){}
+try{ myAreas = JSON.parse(localStorage.getItem("kd-areas")||"[]"); }catch(e){}
+const saveFavs = () => { try{ localStorage.setItem("kd-favs",JSON.stringify([...favs])); }catch(e){} };
+const saveAreas = () => { try{ localStorage.setItem("kd-areas",JSON.stringify(myAreas)); }catch(e){} };
+const NEAR = "__near";
+const locPt = () => [S.loc.lat,S.loc.lng];
+function areaDist(a){ return S.loc ? km(locPt(),GEO[a]) : null; }
+function nearAreas(){ return Object.keys(cityOf(S.country,S.city).areas).filter(a=>areaDist(a)<=S.radius); }
+function curArea(){
+  if(S.area===NEAR) return {th:`รอบ ${S.loc.label} · ${S.radius} กม.`,en:"",near:true};
+  const a = cityOf(S.country,S.city).areas[S.area]; return {th:a[0],en:a[1],near:false};
+}
+
+const STEP_LABELS = ["ประเทศ","เมือง","ย่าน","ประเภท","เวลา","ผลลัพธ์"];
+
+function pool(level){
+  return R.filter(x=>{
+    if(level>=1 && S.country && cityOf(S.country,x.c)===undefined) return false;
+    if(level>=2 && S.city && x.c!==S.city) return false;
+    if(level>=3 && S.area===NEAR && !nearAreas().includes(x.a)) return false;
+    if(level>=3 && S.area && S.area!==NEAR && x.a!==S.area) return false;
+    return true;
+  });
+}
+function countryOf(x){ return Object.keys(COUNTRIES).find(k=>COUNTRIES[k].cities[x.c]); }
+
+/* ---------- chrome ---------- */
+function renderChrome(){
+  const reach = [true,!!S.country,!!S.city,!!S.area,S.cuisines.length>0,S.meal!==null];
+  $("#steps").innerHTML = STEP_LABELS.map((l,i)=>{
+    const cls = i===S.step?"cur":(i<S.step?"done":"");
+    const can = i<=S.step || reach.slice(0,i+1).every(Boolean);
+    return `<button class="st ${cls}" data-go="${i}" ${can?"":"disabled"} aria-label="ขั้นที่ ${i+1} ${l}"><span class="bar"></span><span class="lb">${i+1} ${l}</span></button>`;
+  }).join("");
+  const cr = [];
+  if(S.country) cr.push(COUNTRIES[S.country].name);
+  if(S.city) cr.push(cityOf(S.country,S.city).name);
+  if(S.area) cr.push(curArea().th);
+  if(S.cuisines.length) cr.push(S.cuisines.length===Object.keys(CUISINES).length?"ทุกประเภท":S.cuisines.map(k=>CUISINES[k][1].split(" / ")[0]).join(", "));
+  if(S.meal) cr.push(mealText());
+  $("#crumbs").innerHTML = cr.map(c=>`<span class="crumb"><b>${esc(c)}</b></span>`).join("");
+  $("#crumbs").hidden = cr.length===0;
+}
+function mealText(){
+  const m = MEALS.find(m=>m.k===S.meal);
+  if(S.meal==="any") return "ไม่ระบุเวลา";
+  if(S.meal==="now") return "เปิดตอนนี้";
+  return `${DAYS_FULL[S.day]} ${m.t}`;
+}
+function go(i){ S.step=i; render(); window.scrollTo({top:0,behavior:"smooth"}); }
+
+/* ---------- steps ---------- */
+function head(no,title,sub){ return `<div class="q"><span class="no">ขั้นที่ ${no} / 5</span><h2>${title}</h2>${sub?`<p>${sub}</p>`:""}</div>`; }
+function back(){ return S.step>0?`<button class="btn ghost" data-go="${S.step-1}">← ย้อนกลับ</button>`:"<span></span>"; }
+
+function stepCountry(){
+  return head(1,"อยากไปกินที่ประเทศไหน","เลือกประเทศก่อน แล้วค่อยเจาะลงเมืองและย่าน") +
+  `<div class="grid">${Object.entries(COUNTRIES).map(([k,c])=>{
+    const n = R.filter(x=>c.cities[x.c]).length;
+    return `<button class="opt ${S.country===k?"sel":""}" data-country="${k}"><span class="big">${c.name}</span><span class="sub">${c.en} · ${Object.keys(c.cities).length} เมือง</span><span class="cnt">${n} ร้าน</span></button>`;
+  }).join("")}</div>`;
+}
+function stepCity(){
+  const co = COUNTRIES[S.country];
+  return head(2,`เมืองไหนใน${co.name}`,"") +
+  `<div class="grid">${Object.entries(co.cities).map(([k,c])=>{
+    const n = R.filter(x=>x.c===k).length;
+    return `<button class="opt ${S.city===k?"sel":""}" data-city="${k}"><span class="big">${c.name}</span><span class="sub">${c.en} · ${Object.keys(c.areas).length} ย่าน</span><span class="cnt">${n} ร้าน</span></button>`;
+  }).join("")}</div><div class="actions">${back()}</div>`;
+}
+function locPanel(){
+  const lms = LANDMARKS[S.city]||[];
+  const mine = myAreas.filter(m=>m.city===S.city);
+  const L = S.loc;
+  const savedAlready = L && myAreas.some(m=>m.city===S.city&&Math.abs(m.lat-L.lat)<1e-4&&Math.abs(m.lng-L.lng)<1e-4);
+  let body = `<div class="loc-h"><b>หาย่านจากตำแหน่ง</b><span>เลือกจุดอ้างอิง หรือวางพิกัด/ลิงก์ Google Maps แล้วแอปจะเรียงย่านจากใกล้ไปไกล</span></div>
+    <div class="chips">${mine.map(m=>`<button class="chip mine ${L&&L.myId===m.id?"sel":""}" data-my="${m.id}">★ ${esc(m.name)}</button>`).join("")}${lms.map((l,i)=>`<button class="chip ${L&&L.lm===i?"sel":""}" data-lm="${i}">${esc(l[0])}</button>`).join("")}</div>
+    <div class="locin"><input id="locq" type="text" inputmode="text" autocomplete="off" placeholder="วางพิกัด เช่น 35.6953, 139.7010 หรือลิงก์ Google Maps" aria-label="พิกัดหรือลิงก์ Google Maps"><button class="btn" data-locgo="1">ใช้ตำแหน่งนี้</button></div>
+    ${S.locErr?`<p class="err">${esc(S.locErr)}</p>`:`<p class="hint">วิธีเอาพิกัด: ใน Google Maps กดค้างตรงจุดที่ต้องการ แล้วแตะตัวเลขพิกัดด้านบนเพื่อคัดลอก</p>`}`;
+  if(L){
+    body += `<div class="locnow"><span>ตำแหน่งที่ใช้: <b>${esc(L.label)}</b> <span class="mono">${L.lat.toFixed(4)}, ${L.lng.toFixed(4)}</span></span><button class="tg" data-locclear="1">ล้างตำแหน่ง</button></div>`;
+    if(S.locMove){ const c=COUNTRIES[S.locMove.co].cities[S.locMove.ci];
+      body += `<div class="move">ตำแหน่งนี้อยู่ใกล้ <b>${c.name}</b> มากกว่า${cityOf(S.country,S.city).name} <button class="tg sel" data-move="1">ย้ายไป${c.name}</button></div>`; }
+    body += `<div class="grp radius"><span>รัศมี “รอบตัวฉัน”</span>${[1,2,3,5].map(r=>`<button class="tg ${S.radius===r?"sel":""}" data-radius="${r}">${r} กม.</button>`).join("")}</div>`;
+    if(L.myId) body += `<div class="savebar"><span class="hint">ย่านที่คุณบันทึกไว้</span><button class="tg" data-delmy="${L.myId}">ลบย่านนี้</button></div>`;
+    else if(!savedAlready) body += `<div class="savebar"><input id="myname" type="text" autocomplete="off" placeholder="ตั้งชื่อย่าน เช่น แถวโรงแรม" aria-label="ชื่อย่านของฉัน" value="${esc(L.label.startsWith("จุด")?"":L.label)}"><button class="btn" data-savemy="1">+ บันทึกเป็นย่านของฉัน</button></div>`;
+  }
+  return `<section class="locbox">${body}</section>`;
+}
+function stepArea(){
+  const ci = cityOf(S.country,S.city);
+  let areas = Object.entries(ci.areas).map(([k,[th,en,desc]])=>{
+    const rs = R.filter(x=>x.c===S.city&&x.a===k);
+    const cz = [...new Set(rs.flatMap(x=>x.k))].map(c=>CUISINES[c][1]).join(" ");
+    return {k,th,en,desc,cz,n:rs.length,avg:rs.reduce((s,x)=>s+x.r,0)/rs.length,d:areaDist(k)};
+  });
+  const sortMode = S.areaSort || (S.loc?"near":"default");
+  if(sortMode==="rating") areas.sort((a,b)=>b.avg-a.avg);
+  if(sortMode==="near" && S.loc) areas.sort((a,b)=>a.d-b.d);
+  let nearCard = "";
+  if(S.loc){
+    const na = nearAreas(); const nr = R.filter(x=>x.c===S.city&&na.includes(x.a));
+    nearCard = `<button class="opt near ${S.area===NEAR?"sel":""}" data-area="${NEAR}" ${nr.length?"":"disabled"} data-text="ใกล้ รอบ near"><span class="big">รอบ ${esc(S.loc.label)}</span><span class="sub">ย่านใหม่จากตำแหน่ง · รัศมี ${S.radius} กม.</span>
+      <span class="desc">${na.length?na.map(a=>ci.areas[a][0]).join(", "):"ยังไม่มีย่านในรัศมีนี้ ลองขยายรัศมี"}</span><span class="cnt">${nr.length} ร้าน</span></button>`;
+  }
+  const tgs = [["default","ตามแผนที่"],["rating","คะแนนสูงสุด"]].concat(S.loc?[["near","ใกล้สุด"]]:[]);
+  return head(3,`ย่านไหนใน${ci.name}`,`${areas.length} ย่าน · ตัวเลขใต้ชื่อย่านคือคะแนนรีวิวเฉลี่ยของร้านในย่านนั้น`) +
+  locPanel() +
+  `<div class="areabar"><input id="areaq" type="search" placeholder="ค้นหาย่าน เช่น ราเมง, Shibuya, คาเฟ่" autocomplete="off" aria-label="ค้นหาย่าน">
+    <div class="grp">${tgs.map(([k,l])=>`<button class="tg ${sortMode===k?"sel":""}" data-asort="${k}">${l}</button>`).join("")}</div></div>` +
+  `<div class="grid" id="areagrid">${nearCard}${areas.map(a=>`<button class="opt ${S.area===a.k?"sel":""}" data-area="${a.k}" data-text="${esc((a.th+" "+a.en+" "+a.desc+" "+a.cz).toLowerCase())}"><span class="big">${a.th}</span><span class="sub">${a.en}</span>${a.d!==null?`<span class="dist ${a.d<=S.radius?"in":""}">${distTxt(a.d)}</span>`:""}<span class="desc">${a.desc}</span><span class="cnt">${a.n} ร้าน · เฉลี่ย ★ ${a.avg.toFixed(1)}</span></button>`).join("")}</div>
+  <div class="empty" id="areaempty" hidden>ไม่เจอย่านที่ค้นหา ลองพิมพ์ชื่อภาษาอังกฤษหรือประเภทอาหาร</div>
+  <div class="actions">${back()}</div>`;
+}
+function setLoc(lat,lng,label,extra={}){
+  S.loc = {lat,lng,label,...extra}; S.locErr=""; S.areaSort=null;
+  const nc = nearestCity([lat,lng]);
+  S.locMove = (nc && nc.ci!==S.city && nc.d<40) ? {co:nc.co,ci:nc.ci} : null;
+  if(nc && nc.d>=40) S.locErr = `ตำแหน่งนี้ห่างจากย่านที่มีในแอปเกิน 40 กม. ระยะทางที่แสดงอาจไม่มีประโยชน์`;
+  if(S.area===NEAR) S.cuisines=[];
+}
+function stepCuisine(){
+  const rs = pool(3);
+  const counts = {};
+  rs.forEach(x=>x.k.forEach(k=>counts[k]=(counts[k]||0)+1));
+  const keys = Object.keys(CUISINES).filter(k=>counts[k]);
+  const all = keys.length && keys.every(k=>S.cuisines.includes(k));
+  return head(4,"อยากกินอะไร","เลือกได้มากกว่า 1 ประเภท แสดงเฉพาะประเภทที่มีในย่านนี้") +
+  `<div class="chips"><button class="chip ${all?"sel":""}" data-allc="1">ทุกประเภท<small>${rs.length}</small></button></div>
+   <div class="grid">${keys.map(k=>`<button class="opt ${S.cuisines.includes(k)?"sel":""}" data-cuisine="${k}"><span class="ico" aria-hidden="true">${CUISINES[k][0]}</span><span class="big">${CUISINES[k][1]}</span><span class="cnt">${counts[k]} ร้าน</span></button>`).join("")}</div>
+   <div class="actions">${back()}<button class="btn primary" data-next="4" ${S.cuisines.length?"":"disabled"}>ถัดไป: เลือกเวลา →</button></div>`;
+}
+function stepTime(){
+  const tz = COUNTRIES[S.country].tz;
+  const now = localNow(tz);
+  if(S.day===null) S.day = now.day;
+  const needDay = S.meal && !["now","any"].includes(S.meal);
+  return head(5,"ไปกินตอนไหน",`เวลาท้องถิ่นที่${cityOf(S.country,S.city).name}ตอนนี้ ${DAYS_FULL[now.day]} ${hhmm(now.min)} น. — ระบบจะเช็กว่าร้านเปิดหรือปิดในเวลาที่เลือก`) +
+  `<div class="grid">${MEALS.map(m=>`<button class="opt ${S.meal===m.k?"sel":""}" data-meal="${m.k}"><span class="big">${m.lb}</span><span class="sub">${m.sub}</span></button>`).join("")}</div>
+   <div class="row-label" ${needDay?"":"hidden"}>วัน</div>
+   <div class="chips" ${needDay?"":"hidden"}>${DAYS.map((d,i)=>`<button class="chip ${S.day===i?"sel":""}" data-day="${i}">${d}${i===now.day?"<small>วันนี้</small>":""}</button>`).join("")}</div>
+   <div class="actions">${back()}<button class="btn primary" data-next="5" ${S.meal?"":"disabled"}>ดูร้านแนะนำ →</button></div>`;
+}
+
+function stepResults(){
+  const co = COUNTRIES[S.country], ci = cityOf(S.country,S.city), ar = curArea();
+  let when = null;
+  if(S.meal==="now") when = localNow(co.tz);
+  else if(S.meal!=="any") when = {day:S.day,min:toMin(MEALS.find(m=>m.k===S.meal).t)};
+
+  let rs = pool(3).filter(x=>x.k.some(k=>S.cuisines.includes(k)));
+  rs = rs.map(x=>({...x,st:when?openAt(x,when.day,when.min):null,sm:smart(x)}));
+  if(S.minR) rs = rs.filter(x=>x.r>=S.minR);
+  if(S.resOnly) rs = rs.filter(x=>x.rs!=="no");
+  if(S.openOnly && when) rs = rs.filter(x=>x.st.open);
+  const sorters = {near:(a,b)=>areaDist(a.a)-areaDist(b.a)||b.sm-a.sm, smart:(a,b)=>b.sm-a.sm, rating:(a,b)=>b.r-a.r||b.v-a.v, reviews:(a,b)=>b.v-a.v, price:(a,b)=>a.p-b.p||b.sm-a.sm};
+  rs.sort(sorters[S.sort]);
+  if(when) rs.sort((a,b)=>(b.st.open?1:0)-(a.st.open?1:0));
+  const nOpen = when?rs.filter(x=>x.st.open).length:rs.length;
+
+  const cuiTxt = S.cuisines.map(k=>CUISINES[k][1].split(" / ")[0]).join(", ");
+  const kw = (`${S.cuisines.length<=2?S.cuisines.map(k=>({ramen:"ramen",sushi:"sushi",grill:"bbq",izakaya:"izakaya",fried:"tempura tonkatsu",okonomi:"okonomiyaki",fine:"fine dining",donburi:"donburi",yoshoku:"curry",thai:"thai food",korean:"korean food",seafood:"seafood",street:"street food",cafe:"cafe",dessert:"dessert"}[k])).join(" "):"restaurants"}`);
+  const mapsUrl = ar.near ? `https://www.google.com/maps/search/${encodeURIComponent(kw)}/@${S.loc.lat},${S.loc.lng},15z` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`best ${kw} ${ar.en} ${ci.en}`)}`;
+
+  const tb = (key,val,lbl)=>`<button class="tg ${S[key]===val?"sel":""}" data-set="${key}" data-val="${val}">${lbl}</button>`;
+  return `<div class="q"><span class="no">ผลลัพธ์</span>
+      <p class="sumline"><em>${nOpen}</em> ร้าน${when?"ที่เปิด":""} · ${esc(cuiTxt)} · ${esc(ar.th)}, ${ci.name}</p>${S.loc&&!ar.near?`<p class="hint">ย่านนี้ห่างจาก ${esc(S.loc.label)} ${distTxt(areaDist(S.area))}</p>`:""}
+      <p>${mealText()}${S.meal==="now"?` (${hhmm(when.min)} น. เวลาท้องถิ่น)`:""}</p></div>
+    <div class="toolbar">
+      <div class="grp"><span>เรียงตาม</span>${tb("sort","smart","แนะนำ")}${tb("sort","rating","คะแนน")}${tb("sort","reviews","รีวิวเยอะ")}${tb("sort","price","ราคาถูก")}${S.loc?tb("sort","near","ใกล้สุด"):""}</div>
+      <div class="grp"><span>คะแนนขั้นต่ำ</span>${tb("minR",0,"ทั้งหมด")}${tb("minR",4.3,"4.3+")}${tb("minR",4.5,"4.5+")}</div>
+      <div class="grp">${when?`<button class="tg ${S.openOnly?"sel":""}" data-flip="openOnly">เฉพาะที่เปิด</button>`:""}<button class="tg ${S.resOnly?"sel":""}" data-flip="resOnly">จองได้</button></div>
+    </div>
+    <p class="hint">“แนะนำ” ถ่วงคะแนนด้วยจำนวนรีวิว ร้าน ★4.8 จาก 40 รีวิวจะไม่แซงร้าน ★4.6 จาก 3,000 รีวิวง่าย ๆ</p>
+    <div class="list">${rs.length?rs.map((x,i)=>card(x,i,co)).join(""):`<div class="empty">ไม่มีร้านตรงเงื่อนไข ลองลดคะแนนขั้นต่ำหรือเปลี่ยนเวลา</div>`}</div>
+    <a class="maps" href="${mapsUrl}" target="_blank" rel="noopener">ค้นหาร้าน${esc(cuiTxt)}ของจริง${ar.near?`รอบ ${esc(S.loc.label)} `:`ในย่าน${esc(ar.th)}`}บน <b>Google Maps ↗</b></a>
+    <p class="note">ข้อมูลร้าน เบอร์โทร และคะแนนในหน้านี้เป็นข้อมูลจำลองสำหรับทดลองรูปแบบแอป ถ้าจะใช้จริงให้เชื่อมกับ Google Places API หรือ Tabelog/Wongnai เพื่อดึงคะแนนรีวิวและเวลาเปิดปิดแบบสด</p>
+    <div class="actions"><button class="btn ghost" data-go="4">← เปลี่ยนเวลา</button><button class="btn" data-reset="1">เริ่มค้นหาใหม่</button></div>`;
+}
+
+function card(x,i,co){
+  const stars = "★".repeat(Math.round(x.r))+"☆".repeat(5-Math.round(x.r));
+  let pill = "";
+  if(x.st){
+    if(x.st.open) pill = x.st.left<=60?`<span class="pill p-warn">ใกล้ปิด · อีก ${x.st.left} นาที</span>`:`<span class="pill p-ok">เปิดอยู่</span>`;
+    else pill = `<span class="pill p-bad">ปิดเวลานี้</span>`;
+  }
+  const hours = x.h.split(",").map(s=>s.replace("-","–")).join(", ");
+  const closed = x.x.length?` · หยุด${x.x.map(d=>DAYS[d]).join(" ")}`:" · เปิดทุกวัน";
+  const [rl,rc] = RES[x.rs];
+  return `<article class="card ${x.st&&!x.st.open?"closed":""}">
+    <div class="c-head">
+      <span class="rank">#${i+1}</span>
+      <div><h3 class="c-name">${esc(x.n)}</h3>
+        <div class="c-meta"><span>${x.k.map(k=>CUISINES[k][1].split(" / ")[0]).join(" · ")}</span><span>${co.cur.repeat(x.p)}<span style="opacity:.3">${co.cur.repeat(4-x.p)}</span></span>${pill}${S.loc?`<span class="dist ${areaDist(x.a)<=S.radius?"in":""}">${S.area===NEAR?esc(cityOf(S.country,S.city).areas[x.a][0])+" · ":""}${distTxt(areaDist(x.a)).split(" · ")[0]}</span>`:""}</div></div>
+      <div class="score"><span class="num">${x.r.toFixed(1)}</span><span class="stars" aria-hidden="true">${stars}</span><span class="rv">${x.v.toLocaleString("en-US")} รีวิว</span></div>
+    </div>
+    <div class="facts">
+      <div class="fact"><span class="k">เวลาเปิด–ปิด</span><span class="v mono">${hours}<span style="font-family:var(--f-body);font-size:12.5px;color:var(--ink-3)">${closed}</span></span></div>
+      <div class="fact"><span class="k">โทร</span><span class="v tel"><span class="mono" style="font-family:var(--f-mono);font-size:13.5px">${esc(x.t)}</span><button class="copy" data-copy="${esc(x.t)}">คัดลอก</button></span></div>
+      <div class="fact"><span class="k">การจอง</span><span class="v"><span class="pill ${rc}">${rl}</span>${x.rn?` <span style="font-size:13px;color:var(--ink-2)">${esc(x.rn)}</span>`:""}</span></div>
+      <div class="fact"><span class="k">เมนูเด่น</span><span class="v">${esc(x.d)}</span></div>
+    </div>
+    <div class="c-foot"><div class="tags">${x.g.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+      <button class="fav ${favs.has(x.n)?"on":""}" data-fav="${esc(x.n)}" aria-label="บันทึกร้าน">${favs.has(x.n)?"♥":"♡"}</button></div>
+  </article>`;
+}
+
+/* ---------- render + events ---------- */
+function render(){
+  renderChrome();
+  const fns = [stepCountry,stepCity,stepArea,stepCuisine,stepTime,stepResults];
+  $("#stage").innerHTML = fns[S.step]();
+}
+document.addEventListener("click",e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  const d = b.dataset;
+  if(d.go!==undefined){ go(+d.go); return; }
+  if(d.country){ if(S.country!==d.country){S.city=S.area=null;S.cuisines=[];S.day=null;} S.country=d.country; const cs=Object.keys(COUNTRIES[d.country].cities); if(cs.length===1){S.city=cs[0];go(2);} else go(1); return; }
+  if(d.city){ if(S.city!==d.city){S.area=null;S.cuisines=[];} S.city=d.city; go(2); return; }
+  if(d.area){ if(S.area!==d.area) S.cuisines=[]; S.area=d.area; go(3); return; }
+  if(d.cuisine){ const i=S.cuisines.indexOf(d.cuisine); i>=0?S.cuisines.splice(i,1):S.cuisines.push(d.cuisine); render(); return; }
+  if(d.allc){ const ks=[...new Set(pool(3).flatMap(x=>x.k))]; S.cuisines = ks.every(k=>S.cuisines.includes(k))?[]:ks; render(); return; }
+  if(d.asort){ S.areaSort=d.asort; render(); return; }
+  if(d.lm!==undefined){ const l=LANDMARKS[S.city][+d.lm]; setLoc(l[1],l[2],l[0],{lm:+d.lm}); render(); return; }
+  if(d.my){ const m=myAreas.find(m=>String(m.id)===d.my); if(m){ setLoc(m.lat,m.lng,m.name,{myId:m.id}); S.area=NEAR; S.cuisines=[]; go(3);} return; }
+  if(d.locgo){ const r=parseLoc($("#locq").value); if(r.err){S.locErr=r.err;} else setLoc(r.lat,r.lng,"จุดที่ปักหมุด"); render(); return; }
+  if(d.locclear){ S.loc=null; S.locErr=""; S.locMove=null; S.areaSort=null; if(S.area===NEAR){S.area=null;S.cuisines=[];} render(); return; }
+  if(d.radius){ S.radius=+d.radius; render(); return; }
+  if(d.move){ const {co,ci}=S.locMove; Object.assign(S,{country:co,city:ci,area:null,cuisines:[],day:null,locMove:null}); S.loc={...S.loc,lm:undefined}; render(); return; }
+  if(d.savemy){ const name=($("#myname").value.trim()||"ย่านของฉัน").slice(0,40); const id=Date.now();
+    myAreas.push({id,city:S.city,name,lat:S.loc.lat,lng:S.loc.lng}); saveAreas(); S.loc={...S.loc,label:name,myId:id,lm:undefined}; render(); return; }
+  if(d.delmy){ myAreas=myAreas.filter(m=>String(m.id)!==d.delmy); saveAreas(); S.loc={...S.loc,myId:undefined}; render(); return; }
+  if(d.meal){ S.meal=d.meal; render(); return; }
+  if(d.day!==undefined){ S.day=+d.day; render(); return; }
+  if(d.next){ go(+d.next); return; }
+  if(d.set){ S[d.set] = d.set==="sort"?d.val:+d.val; render(); return; }
+  if(d.flip){ S[d.flip]=!S[d.flip]; render(); return; }
+  if(d.fav){ favs.has(d.fav)?favs.delete(d.fav):favs.add(d.fav); saveFavs(); render(); return; }
+  if(d.reset){ Object.assign(S,{step:0,country:null,city:null,area:null,cuisines:[],day:null,meal:null,minR:0,resOnly:false,openOnly:false,sort:"smart",areaSort:null,locMove:null}); render(); return; }
+  if(d.copy){
+    const done = ()=>{ b.textContent="คัดลอกแล้ว"; setTimeout(()=>b.textContent="คัดลอก",1500); };
+    try{ navigator.clipboard.writeText(d.copy).then(done,()=>selectText(b)); }catch(err){ selectText(b); }
+  }
+});
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Enter") return;
+  if(e.target.id==="locq"){ e.preventDefault(); document.querySelector("[data-locgo]").click(); }
+  if(e.target.id==="myname"){ e.preventDefault(); document.querySelector("[data-savemy]").click(); }
+});
+document.addEventListener("input",e=>{
+  if(e.target.id!=="areaq") return;
+  const q = e.target.value.trim().toLowerCase();
+  let shown = 0;
+  document.querySelectorAll("#areagrid .opt").forEach(o=>{ const hit=!q||o.dataset.text.includes(q); o.hidden=!hit; if(hit) shown++; });
+  $("#areaempty").hidden = shown>0;
+});
+function selectText(b){ const el=b.previousElementSibling; const r=document.createRange(); r.selectNodeContents(el); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+// เปิดมาในสถานะตัวอย่าง: ญี่ปุ่น › โตเกียว พร้อมให้เลือกย่าน
+Object.assign(S,{country:"jp",city:"tokyo",step:2});
+render();
+</script>
+
+</body>
+</html>
