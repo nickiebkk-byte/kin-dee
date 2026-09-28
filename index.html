@@ -508,6 +508,8 @@ async function fetchWiki(key,title){
   setIMG(key,{src:thumb.replace(/\/(\d+)px-/,"/640px-"),alt:thumb,by:"Wikipedia",g:0,w:1});
   return true;
 }
+const MEAL_WIKI={now:["⏰","Clock"],breakfast:["🍳","Full_breakfast"],lunch:["🍱","Bento"],afternoon:["🍰","Afternoon_tea"],
+  dinner:["🍲","Shabu-shabu"],late:["🌙","Night_market"],any:["🍽️","Buffet"]};
 function want(key,q,wiki){
   if((!wiki&&!REAL())||IMG(key)||imgTried.has(key)||coverQueued.has(key)) return;
   coverQueued.add(key); coverQ.push([key,q,wiki]); setTimeout(pumpCovers,0);
@@ -842,7 +844,7 @@ function stepTime(){
   if(S.day===null) S.day=now.day;
   const needDay=S.meal&&!["now","any"].includes(S.meal);
   return head(5,"ไปกินตอนไหน",`เวลา${S.country?"ท้องถิ่นที่"+placeName():"ในเครื่อง"}ตอนนี้ ${DAYS_FULL[now.day]} ${hhmm(now.min)} น. แอปจะเช็กว่าร้านเปิดหรือปิดในเวลาที่เลือก`) +
-  `<div class="grid">${MEALS.map(m=>`<button class="opt ${S.meal===m.k?"sel":""}" data-meal="${m.k}"><span class="big">${m.lb}</span><span class="sub">${m.sub}</span></button>`).join("")}</div>
+  `<div class="grid">${MEALS.map(m=>`<button class="opt pc ${S.meal===m.k?"sel":""}" data-meal="${m.k}">${cover("mw-"+m.k,MEAL_WIKI[m.k][1],MEAL_WIKI[m.k][0],MEAL_WIKI[m.k][1])}<span class="obody"><span class="big">${m.lb}</span><span class="sub">${m.sub}</span></span></button>`).join("")}</div>
    <div class="row-label" ${needDay?"":"hidden"}>วัน</div>
    <div class="chips" ${needDay?"":"hidden"}>${DAYS.map((d,i)=>`<button class="chip ${S.day===i?"sel":""}" data-day="${i}">${d}${i===now.day?"<small>วันนี้</small>":""}</button>`).join("")}</div>
    <div class="actions">${back()}<button class="btn primary" data-next="5" ${S.meal?"":"disabled"}>ดูร้านแนะนำ →</button></div>`;
