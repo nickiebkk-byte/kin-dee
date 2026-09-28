@@ -249,6 +249,23 @@ details summary{cursor:pointer;color:var(--violet);font-size:12px;font-weight:60
 .cbtn.del{color:var(--bad)}
 .xdel{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:1px solid var(--cardline);background:#fff;color:var(--bad);display:grid;place-items:center;font-size:12px;z-index:2}
 @media (max-width:480px){.cgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.ctext .big{font-size:17px}.cflag{font-size:34px}}
+
+/* การ์ดมีรูป (ย่าน / ประเภทอาหาร / สถานที่) */
+.opt.pc{padding:0;overflow:hidden;gap:0}
+.oimg{display:block;position:relative;width:100%;aspect-ratio:16/10;max-width:100%;background:radial-gradient(90% 80% at 100% 0%,rgba(139,92,246,.55),transparent 60%),linear-gradient(160deg,#312e81,#0f172a);overflow:hidden}
+.oimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ofb{position:absolute;inset:0;display:grid;place-items:center;font-size:38px;color:rgba(255,255,255,.55)}
+.ocred{position:absolute;left:8px;bottom:6px;font-size:9px;color:rgba(255,255,255,.85);text-shadow:0 1px 2px rgba(0,0,0,.8);max-width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.obody{display:flex;flex-direction:column;gap:2px;padding:10px 14px 13px}
+.opt.pc.sel .oimg::after{content:"";position:absolute;inset:0;background:rgba(37,99,235,.35)}
+.opt.pc.sel::after{z-index:2}
+/* แถบรูปร้าน */
+.pstrip{display:grid;gap:6px;margin:-4px -4px 0}
+.pstrip.n1{grid-template-columns:1fr}
+.pstrip.n2{grid-template-columns:1fr 1fr}
+.pstrip.n3{grid-template-columns:2fr 1fr 1fr}
+.pstrip img{width:100%;height:132px;object-fit:cover;border-radius:16px;background:var(--inner);display:block}
+@media (max-width:480px){.pstrip img{height:104px}.pstrip.n3{grid-template-columns:1.6fr 1fr 1fr}}
 </style>
 </head>
 <body>
@@ -455,6 +472,24 @@ async function fetchCover(key,q){
   if(!ph) return;
   setIMG(key,{src:ph.getURI({maxWidth:800,maxHeight:600}),by:ph.authorAttributions&&ph.authorAttributions[0]?ph.authorAttributions[0].displayName:"",g:1});
 }
+const FOOD_Q={ramen:"tonkotsu ramen bowl",sushi:"sushi omakase counter",grill:"yakiniku wagyu grill",izakaya:"izakaya yakitori",fried:"tonkatsu tempura",
+  okonomi:"okonomiyaki teppan",donburi:"kaisendon rice bowl",yoshoku:"japanese curry omurice",fine:"kaiseki fine dining",thai:"thai food pad thai tom yum",
+  korean:"korean bbq samgyeopsal",seafood:"seafood crab lobster",street:"street food night market",cafe:"specialty coffee cafe latte art",dessert:"parfait dessert cafe"};
+const coverQ=[], coverQueued=new Set(); let coverActive=0;
+function want(key,q){
+  if(!REAL()||IMG(key)||imgTried.has(key)||coverQueued.has(key)) return;
+  coverQueued.add(key); coverQ.push([key,q]); setTimeout(pumpCovers,0);
+}
+function pumpCovers(){
+  while(coverActive<3&&coverQ.length){
+    const [k,q]=coverQ.shift(); coverActive++;
+    fetchCover(k,q).catch(()=>{}).finally(()=>{ coverActive--; paintCover(k); pumpCovers(); });
+  }
+}
+function coverImgHTML(key,im){ return `<img src="${esc(im.src)}" alt="" loading="lazy" data-imgkey="${esc(key)}">${im.g&&im.by?`<span class="ocred">รูป: ${esc(im.by)} · Google</span>`:""}`; }
+function paintCover(k){ const im=IMG(k); if(!im) return; document.querySelectorAll(`[data-cover="${k}"]`).forEach(el=>{ el.innerHTML=coverImgHTML(k,im); }); }
+function cover(key,q,fb){ want(key,q); const im=IMG(key);
+  return `<span class="oimg" data-cover="${esc(key)}">${im?coverImgHTML(key,im):`<span class="ofb" aria-hidden="true">${fb}</span>`}</span>`; }
 function loadCovers(){
   if(!REAL()) return;
   const todo=[...Object.keys(COUNTRIES).filter(k=>!hiddenPresets.includes(k)).map(k=>[k,PRESET_IMGQ[k]]),
@@ -544,7 +579,7 @@ async function fetchReal(center,radiusM,cuis){
       p:PRICE[String(p.priceLevel||"").toUpperCase()]||0,periods:p.regularOpeningHours?p.regularOpeningHours.periods:null,
       wd:p.regularOpeningHours?p.regularOpeningHours.weekdayDescriptions:null,off:p.utcOffsetMinutes,
       t:p.internationalPhoneNumber||p.nationalPhoneNumber||"",resv:p.reservable,maps:p.googleMapsURI||"",addr:p.formattedAddress||"",
-      web:p.websiteURI||"",photo,photoBy:ph&&ph.authorAttributions&&ph.authorAttributions[0]?ph.authorAttributions[0].displayName:"",lat,lng});
+      web:p.websiteURI||"",photo,photos:(p.photos||[]).slice(0,3).map(ph=>{ try{ return ph.getURI({maxWidth:480,maxHeight:360}); }catch(e){ return ""; } }).filter(Boolean),photoBy:ph&&ph.authorAttributions&&ph.authorAttributions[0]?ph.authorAttributions[0].displayName:"",lat,lng});
   }
   const out={list:[...map.values()],calls:qs.length};
   cache.set(ck,out); return out;
@@ -709,7 +744,7 @@ function stepUCity(){
   return head(2,`ไปที่ไหนใน${esc(c.name)}`,"เลือกเมืองหรือย่านที่บันทึกไว้ หรือเพิ่มใหม่ด้านล่าง") +
   `<div class="grid">
     <button class="opt near" data-ucenter="1"><span class="big">ทั่ว${esc(c.name)}</span><span class="desc">ค้นร้านรอบจุดกลางของ${esc(c.name)}</span><span class="cnt">รัศมี 5 กม.</span></button>
-    ${c.places.map(p=>`<div class="ccard-wrap"><button class="opt" data-uplace="${esc(p.id)}"><span class="big">${esc(p.name)}</span><span class="desc">${esc(p.addr)}</span><span class="cnt">ค้นร้านรอบนี้ →</span></button><button class="xdel" data-delplace="${esc(p.id)}" aria-label="ลบ ${esc(p.name)}"><i class="fa-solid fa-xmark"></i></button></div>`).join("")}
+    ${c.places.map(p=>`<div class="ccard-wrap"><button class="opt pc" data-uplace="${esc(p.id)}">${cover("pl-"+p.id,p.name+" "+c.q,'<i class="fa-solid fa-location-dot"></i>')}<span class="obody"><span class="big">${esc(p.name)}</span><span class="desc">${esc(p.addr)}</span><span class="cnt">ค้นร้านรอบนี้ →</span></span></button><button class="xdel" data-delplace="${esc(p.id)}" aria-label="ลบ ${esc(p.name)}"><i class="fa-solid fa-xmark"></i></button></div>`).join("")}
   </div>` + searchPanel(`เพิ่มเมือง / ย่านใน${esc(c.name)}`,"พิมพ์ชื่อเมือง ย่าน หรือสถานที่ แล้วเลือกผลที่ตรง","เช่น ชื่อเมือง ย่าน หรือสถานที่ดัง") +
   `<div class="actions"><button class="btn ghost" data-go="0">← ย้อนกลับ</button></div>`;
 }
@@ -755,7 +790,7 @@ function stepArea(){
   locPanel() +
   `<div class="areabar"><input id="areaq" type="search" placeholder="ค้นหาย่าน เช่น ราเมง, Shibuya, คาเฟ่" autocomplete="off" aria-label="ค้นหาย่าน">
     <div class="grp">${tgs.map(([k,l])=>`<button class="tg ${sortMode===k?"sel":""}" data-asort="${k}">${l}</button>`).join("")}</div></div>
-  <div class="grid" id="areagrid">${nearCard}${areas.map(a=>`<button class="opt ${S.area===a.k?"sel":""}" data-area="${a.k}" data-text="${esc((a.th+" "+a.en+" "+a.desc).toLowerCase())}"><span class="big">${a.th}</span><span class="sub">${a.en}</span>${a.d!==null?`<span class="dist ${a.d<=S.radius?"in":""}">${distTxt(a.d)}</span>`:""}<span class="desc">${a.desc}</span></button>`).join("")}</div>
+  <div class="grid" id="areagrid">${nearCard}${areas.map(a=>`<button class="opt pc ${S.area===a.k?"sel":""}" data-area="${a.k}" data-text="${esc((a.th+" "+a.en+" "+a.desc).toLowerCase())}">${cover("ar-"+a.k,a.en+" "+ci.en,'<i class="fa-solid fa-map-location-dot"></i>')}<span class="obody"><span class="big">${a.th}</span><span class="sub">${a.en}</span>${a.d!==null?`<span class="dist ${a.d<=S.radius?"in":""}">${distTxt(a.d)}</span>`:""}<span class="desc">${a.desc}</span></span></button>`).join("")}</div>
   <div class="empty" id="areaempty" hidden>ไม่เจอย่านที่ค้นหา ลองพิมพ์ชื่อภาษาอังกฤษหรือประเภทอาหาร</div>
   <div class="actions">${back()}</div>`;
 }
@@ -764,7 +799,7 @@ function stepCuisine(){
     const all=S.cuisines.includes("_all");
     return head(4,"อยากกินอะไร","เลือกได้สูงสุด 3 ประเภท (1 ประเภท = 1 คำขอค้นหา)") +
     `<div class="chips"><button class="chip ${all?"sel":""}" data-allc="1">ร้านอาหารทุกประเภท</button></div>
-     <div class="grid">${Object.keys(CUISINES).map(k=>`<button class="opt ${S.cuisines.includes(k)?"sel":""}" data-cuisine="${k}"><span class="ico" aria-hidden="true">${CUISINES[k][0]}</span><span class="big">${CUISINES[k][1]}</span></button>`).join("")}</div>
+     <div class="grid">${Object.keys(CUISINES).map(k=>`<button class="opt pc ${S.cuisines.includes(k)?"sel":""}" data-cuisine="${k}">${cover("cz-"+k,FOOD_Q[k],CUISINES[k][0])}<span class="obody"><span class="big">${CUISINES[k][1]}</span></span></button>`).join("")}</div>
      ${S.cuisines.length>=3?`<p class="hint">เลือกครบ 3 ประเภทแล้ว กดประเภทที่เลือกไว้เพื่อเอาออก</p>`:""}
      <div class="actions">${bk}<button class="btn primary" data-next="4" ${S.cuisines.length?"":"disabled"}>ถัดไป: เลือกเวลา →</button></div>`;
 }
@@ -856,8 +891,9 @@ function cardReal(x,i){
   const dist=x.dist!=null?`<span class="dist in">${distTxt(x.dist)}</span>`:"";
   const nav=`https://www.google.com/maps/dir/?api=1&destination=${x.lat},${x.lng}&destination_place_id=${encodeURIComponent(x.id)}`;
   return `<article class="card ${x.st&&x.st.open===false?"closed":""}">
-    <div class="c-head ${x.photo?"wp":""}">${x.photo?`<img class="thumb" src="${esc(x.photo)}" alt="" loading="lazy">`:`<span class="rank ${i<3?"rk1":""}">#${i+1}</span>`}
-      <div>${x.photo?`<span class="rank inl ${i<3?"rk1":""}">#${i+1}</span>`:""}<h3 class="c-name">${esc(x.n)}</h3>
+    ${x.photos&&x.photos.length?`<div class="pstrip n${x.photos.length}">${x.photos.map(u=>`<img src="${esc(u)}" alt="" loading="lazy">`).join("")}</div>`:""}
+    <div class="c-head"><span class="rank ${i<3?"rk1":""}">#${i+1}</span>
+      <div><h3 class="c-name">${esc(x.n)}</h3>
         <div class="c-meta"><span>${esc(x.type||cuisineText())}</span>${x.p?`<span>${cur.repeat(x.p)}<span class="dim">${cur.repeat(4-x.p)}</span></span>`:""}${pillFor(x)}${dist}</div></div>
       ${scoreHTML(x)}</div>
     <div class="facts">
