@@ -357,8 +357,8 @@ const CUISINE_Q = {ramen:"ramen noodles",sushi:"sushi",grill:"yakiniku bbq grill
   donburi:"donburi rice bowl",yoshoku:"japanese curry omurice",fine:"fine dining",thai:"thai restaurant",korean:"korean restaurant",
   seafood:"seafood restaurant",street:"street food",cafe:"cafe",dessert:"dessert",_all:"restaurant"};
 const PRICE = {FREE:0,INEXPENSIVE:1,MODERATE:2,EXPENSIVE:3,VERY_EXPENSIVE:4,PRICE_LEVEL_INEXPENSIVE:1,PRICE_LEVEL_MODERATE:2,PRICE_LEVEL_EXPENSIVE:3,PRICE_LEVEL_VERY_EXPENSIVE:4};
-const FIELDS = ["id","displayName","location","rating","userRatingCount","priceLevel","regularOpeningHours","utcOffsetMinutes",
-  "internationalPhoneNumber","nationalPhoneNumber","reservable","googleMapsURI","formattedAddress","websiteURI","photos","primaryTypeDisplayName","businessStatus"];
+let FIELDS = ["id","displayName","location","rating","userRatingCount","priceLevel","regularOpeningHours","utcOffsetMinutes",
+  "internationalPhoneNumber","nationalPhoneNumber","googleMapsURI","formattedAddress","websiteURI","photos","primaryTypeDisplayName","businessStatus"];
 
 /* ---------- helpers ---------- */
 const $ = s => document.querySelector(s);
@@ -435,9 +435,23 @@ async function fetchReal(center,radiusM,cuis){
   await loadGoogle();
   const {Place}=await google.maps.importLibrary("places");
   const qs=cuis.length?cuis:["_all"];
-  const res=await Promise.all(qs.map(k=>Place.searchByText({
-    textQuery:"best "+CUISINE_Q[k], fields:FIELDS, rankPreference:"RELEVANCE", locationBias:{center,radius:Math.min(radiusM,50000)}, maxResultCount:20, language:"th"
-  }).then(r=>({k,places:r.places||[]}))));
+  // ถ้า Google ไม่รู้จักข้อมูลบางช่อง ให้ตัดช่องนั้นออกแล้วค้นใหม่ (สูงสุด 3 ครั้ง)
+  async function search(k){
+    for(let i=0;i<3;i++){
+      try{
+        const r=await Place.searchByText({textQuery:"best "+CUISINE_Q[k], fields:FIELDS, rankPreference:"RELEVANCE",
+          locationBias:{center,radius:Math.min(radiusM,50000)}, maxResultCount:20, language:"th"});
+        return {k,places:r.places||[]};
+      }catch(e){
+        const m=String(e&&e.message||e).match(/Unknown fields requested:\s*([\w,\s]+)/);
+        if(!m) throw e;
+        const bad=m[1].split(/[,\s]+/).filter(Boolean);
+        for(const f of bad){ const j=FIELDS.indexOf(f); if(j>=0) FIELDS.splice(j,1); }
+      }
+    }
+    throw new Error("Google ไม่รับคำขอข้อมูลร้าน");
+  }
+  const res=await Promise.all(qs.map(search));
   const map=new Map();
   for(const {k,places} of res) for(const p of places){
     if(p.businessStatus && String(p.businessStatus)!=="OPERATIONAL") continue;
@@ -685,7 +699,7 @@ function stepResults(){
     `<div class="toolbar">
       <div class="grp"><span>เรียงตาม</span>${tb("sort","smart","แนะนำ")}${tb("sort","rating","คะแนน")}${tb("sort","reviews","รีวิวเยอะ")}${hasDist?tb("sort","near","ใกล้สุด"):""}${tb("sort","price","ราคาถูก")}</div>
       <div class="grp"><span>คะแนนขั้นต่ำ</span>${tb("minR",0,"ทั้งหมด")}${tb("minR",4.3,"4.3+")}${tb("minR",4.5,"4.5+")}</div>
-      <div class="grp">${S.meal!=="any"?`<button class="tg ${S.openOnly?"sel":""}" data-flip="openOnly">เฉพาะที่เปิด</button>`:""}<button class="tg ${S.resOnly?"sel":""}" data-flip="resOnly">รับจอง</button></div>
+      <div class="grp">${S.meal!=="any"?`<button class="tg ${S.openOnly?"sel":""}" data-flip="openOnly">เฉพาะที่เปิด</button>`:""}</div>
     </div>
     <p class="hint">${meta?esc(meta)+" · ":""}“แนะนำ” ถ่วงคะแนนด้วยจำนวนรีวิว ร้านที่ได้ ★4.8 จาก 40 รีวิวจะไม่แซงร้าน ★4.6 จาก 3,000 รีวิวง่าย ๆ</p>
     <div class="list">${shown.length?shown.map((x,i)=>cardReal(x,i)).join(""):`<div class="empty">ไม่มีร้านตรงเงื่อนไข ลองลดคะแนนขั้นต่ำ ขยายรัศมี หรือเปลี่ยนเวลา</div>`}</div>
@@ -714,7 +728,7 @@ function cardReal(x,i){
   const todayTxt=today?today.replace(/^[^:]+:\s*/,""):"ไม่มีข้อมูลเวลา";
   const cur=S.country?COUNTRIES[S.country].cur:"$";
   const resv=x.resv===true?`<span class="pill p-warn">รับจอง</span> <span class="v-note">โทรหรือจองผ่านเว็บร้าน</span>`
-    :x.resv===false?`<span class="pill p-ok">ไม่รับจอง · Walk-in</span>`:`<span class="pill p-mute">ไม่มีข้อมูล</span>`;
+    :x.resv===false?`<span class="pill p-ok">ไม่รับจอง · Walk-in</span>`:`<span class="v-note">โทรถามร้าน หรือดูในเว็บไซต์ร้าน</span>`;
   const dist=x.dist!=null?`<span class="dist in">${distTxt(x.dist)}</span>`:"";
   const nav=`https://www.google.com/maps/dir/?api=1&destination=${x.lat},${x.lng}&destination_place_id=${encodeURIComponent(x.id)}`;
   return `<article class="card ${x.st&&x.st.open===false?"closed":""}">
