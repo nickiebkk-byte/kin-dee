@@ -495,19 +495,33 @@ const FOOD_Q={ramen:"tonkotsu ramen bowl",sushi:"sushi omakase counter",grill:"y
   okonomi:"okonomiyaki teppan",donburi:"kaisendon rice bowl",yoshoku:"japanese curry omurice",fine:"kaiseki fine dining",thai:"thai food pad thai tom yum",
   korean:"korean bbq samgyeopsal",seafood:"seafood crab lobster",street:"street food night market",cafe:"specialty coffee cafe latte art",dessert:"parfait dessert cafe"};
 const coverQ=[], coverQueued=new Set(); let coverActive=0;
-function want(key,q){
-  if(!REAL()||IMG(key)||imgTried.has(key)||coverQueued.has(key)) return;
-  coverQueued.add(key); coverQ.push([key,q]); setTimeout(pumpCovers,0);
+const FOOD_WIKI={ramen:"Ramen",sushi:"Sushi",grill:"Yakiniku",izakaya:"Yakitori",fried:"Tonkatsu",okonomi:"Okonomiyaki",donburi:"Donburi",
+  yoshoku:"Japanese_curry",fine:"Kaiseki",thai:"Pad_thai",korean:"Samgyeop-sal",seafood:"Chilli_crab",street:"Street_food",cafe:"Latte_art",dessert:"Parfait"};
+// รูปจาก Wikipedia (ฟรี) ถ้าไม่มีค่อยใช้รูปจาก Google
+async function fetchWiki(key,title){
+  imgTried.add(key);
+  const r=await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+  if(!r.ok) return false;
+  const j=await r.json();
+  const thumb=(j.thumbnail&&j.thumbnail.source)||(j.originalimage&&j.originalimage.source);
+  if(!thumb) return false;
+  setIMG(key,{src:thumb.replace(/\/(\d+)px-/,"/640px-"),alt:thumb,by:"Wikipedia",g:0,w:1});
+  return true;
+}
+function want(key,q,wiki){
+  if((!wiki&&!REAL())||IMG(key)||imgTried.has(key)||coverQueued.has(key)) return;
+  coverQueued.add(key); coverQ.push([key,q,wiki]); setTimeout(pumpCovers,0);
 }
 function pumpCovers(){
   while(coverActive<3&&coverQ.length){
-    const [k,q]=coverQ.shift(); coverActive++;
-    fetchCover(k,q).catch(()=>{}).finally(()=>{ coverActive--; paintCover(k); pumpCovers(); });
+    const [k,q,wiki]=coverQ.shift(); coverActive++;
+    const job=wiki ? fetchWiki(k,wiki).catch(()=>false).then(ok=>ok||!REAL()?null:fetchCover(k,q)) : fetchCover(k,q);
+    job.catch(()=>{}).finally(()=>{ coverActive--; paintCover(k); pumpCovers(); });
   }
 }
-function coverImgHTML(key,im){ return `<img src="${esc(im.src)}" alt="" loading="lazy" data-imgkey="${esc(key)}">${im.g&&im.by?`<span class="ocred">รูป: ${esc(im.by)} · Google</span>`:""}`; }
+function coverImgHTML(key,im){ return `<img src="${esc(im.src)}" alt="" loading="lazy" data-imgkey="${esc(key)}">${im.w?`<span class="ocred">รูป: Wikipedia</span>`:im.g&&im.by?`<span class="ocred">รูป: ${esc(im.by)} · Google</span>`:""}`; }
 function paintCover(k){ const im=IMG(k); if(!im) return; document.querySelectorAll(`[data-cover="${k}"]`).forEach(el=>{ el.innerHTML=coverImgHTML(k,im); }); }
-function cover(key,q,fb){ want(key,q); const im=IMG(key);
+function cover(key,q,fb,wiki){ want(key,q,wiki); const im=IMG(key);
   return `<span class="oimg" data-cover="${esc(key)}">${im?coverImgHTML(key,im):`<span class="ofb" aria-hidden="true">${fb}</span>`}</span>`; }
 function loadCovers(){
   if(!REAL()) return;
@@ -771,7 +785,7 @@ function stepCity(){
   const co=COUNTRIES[S.country];
   return head(2,`เมืองไหนใน${co.name}`,"") +
   `<div class="grid">${Object.entries(co.cities).map(([k,c])=>{
-    return `<button class="opt ${S.city===k?"sel":""}" data-city="${k}"><span class="big">${c.name}</span><span class="sub">${c.en} · ${Object.keys(c.areas).length} ย่าน</span></button>`;
+    return `<button class="opt pc ${S.city===k?"sel":""}" data-city="${k}">${cover("cw-"+k,c.en+" city skyline",'<i class="fa-solid fa-city"></i>',c.en.replace(/ /g,"_"))}<span class="obody"><span class="big">${c.name}</span><span class="sub">${c.en} · ${Object.keys(c.areas).length} ย่าน</span></span></button>`;
   }).join("")}</div><div class="actions">${back()}</div>`;
 }
 function locPanel(){
@@ -818,7 +832,7 @@ function stepCuisine(){
     const all=S.cuisines.includes("_all");
     return head(4,"อยากกินอะไร","เลือกได้สูงสุด 3 ประเภท (1 ประเภท = 1 คำขอค้นหา)") +
     `<div class="chips"><button class="chip ${all?"sel":""}" data-allc="1">ร้านอาหารทุกประเภท</button></div>
-     <div class="grid">${Object.keys(CUISINES).map(k=>`<button class="opt pc ${S.cuisines.includes(k)?"sel":""}" data-cuisine="${k}">${cover("cz-"+k,FOOD_Q[k],CUISINES[k][0])}<span class="obody"><span class="big">${CUISINES[k][1]}</span></span></button>`).join("")}</div>
+     <div class="grid">${Object.keys(CUISINES).map(k=>`<button class="opt pc ${S.cuisines.includes(k)?"sel":""}" data-cuisine="${k}">${cover("czw-"+k,FOOD_Q[k],CUISINES[k][0],FOOD_WIKI[k])}<span class="obody"><span class="big">${CUISINES[k][1]}</span></span></button>`).join("")}</div>
      ${S.cuisines.length>=3?`<p class="hint">เลือกครบ 3 ประเภทแล้ว กดประเภทที่เลือกไว้เพื่อเอาออก</p>`:""}
      <div class="actions">${bk}<button class="btn primary" data-next="4" ${S.cuisines.length?"":"disabled"}>ถัดไป: เลือกเวลา →</button></div>`;
 }
@@ -1034,6 +1048,8 @@ document.addEventListener("change",e=>{
 });
 document.addEventListener("error",e=>{
   const k=e.target&&e.target.dataset&&e.target.dataset.imgkey; if(!k) return;
+  const im=IMG(k);
+  if(im&&im.alt&&im.src!==im.alt){ setIMG(k,{...im,src:im.alt,alt:null}); e.target.src=im.alt; return; }
   setIMG(k,null); imgTried.add(k); render();
 },true);
 function selectText(b){ const el=b.previousElementSibling; const r=document.createRange(); r.selectNodeContents(el); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
