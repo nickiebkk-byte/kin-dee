@@ -350,7 +350,7 @@ const DAYS_FULL = ["วันอาทิตย์","วันจันทร์
 
 /* ---------- ตั้งค่า Google ---------- */
 // ใส่ API key ตรงนี้ก่อน deploy ขึ้น Firebase ได้ หรือใส่ผ่านปุ่ม "ตั้งค่า" ในแอป (เก็บไว้ในเครื่องนั้น)
-const API_KEY_IN_FILE = "";
+const API_KEY_IN_FILE = "AIzaSyDxrYqPObgMmCMMxzZniqFJ27q7XCi83SA";
 function getKey(){ if(API_KEY_IN_FILE) return API_KEY_IN_FILE; try{ return localStorage.getItem("kd-key")||""; }catch(e){ return ""; } }
 const REAL = () => !!getKey();
 const CUISINE_Q = {ramen:"ramen noodles",sushi:"sushi",grill:"yakiniku bbq grill",izakaya:"izakaya",fried:"tempura tonkatsu",okonomi:"okonomiyaki",
