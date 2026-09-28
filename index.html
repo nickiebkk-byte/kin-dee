@@ -285,6 +285,36 @@ details summary{cursor:pointer;color:var(--violet);font-size:12px;font-weight:60
 .rst small{color:#fff;opacity:.85;font-weight:600;letter-spacing:0;margin-left:4px}
 .rmore{display:flex;justify-content:space-between;align-items:center;width:100%;border:0;background:rgba(255,255,255,.18);color:#fff;font-weight:700;font-size:13px;padding:10px 14px;box-shadow:none;border-radius:0}
 .ropen{background:var(--card);color:var(--ink);padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px}
+
+/* หน้าเลือกเวลา: สีท้องฟ้า */
+.skygrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.sky{position:relative;border:0;border-radius:20px;padding:12px;color:#fff;min-height:110px;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:1px;text-align:left;overflow:hidden;box-shadow:0 12px 22px -14px rgba(15,23,42,.6);transition:transform .15s}
+.sky:hover{transform:translateY(-2px)}
+.sic{position:absolute;top:8px;right:10px;font-size:26px;line-height:1}
+.sky b{font-size:16px;line-height:1.2;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.25)}
+.sky span{font-size:12px;font-weight:600;opacity:.95}
+.sky .snow{font-size:22px;font-weight:800;line-height:1;opacity:1}
+.sky.sel{outline:3px solid var(--yellow);outline-offset:2px}
+.sky.sel::after{content:"\2713";position:absolute;top:8px;left:10px;width:22px;height:22px;border-radius:50%;background:var(--yellow);color:var(--ink);font-weight:900;display:grid;place-items:center;font-size:12px}
+.sky.wide{min-height:58px;width:100%;flex-direction:row;align-items:center;justify-content:flex-start;gap:10px}
+.sky.wide .sic{position:static;font-size:24px}
+.sky.wide > span:last-child{margin-left:auto}
+.sky.wide.sel::after{left:auto;right:12px;top:50%;transform:translateY(-50%)}
+.sky.wide.sel > span:last-child{margin-right:30px}
+.s-now{background:linear-gradient(135deg,#34d399,#059669)}
+.s-breakfast{background:linear-gradient(160deg,#fde68a,#fb923c 60%,#f472b6)}
+.s-lunch{background:linear-gradient(160deg,#7dd3fc,#3b82f6)}
+.s-afternoon{background:linear-gradient(160deg,#fcd34d,#f59e0b 70%,#d97706)}
+.s-dinner{background:linear-gradient(160deg,#f472b6,#7c3aed 60%,#312e81)}
+.s-late{background:radial-gradient(40% 40% at 80% 20%,rgba(255,255,255,.2),transparent),linear-gradient(160deg,#1e3a8a,#0f172a)}
+.s-any{background:linear-gradient(160deg,#cbd5e1,#64748b)}
+.dayrow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.dayb{border:1px solid var(--cardline);background:var(--card);border-radius:16px;padding:12px 0 8px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:var(--depth-sm);color:var(--ink)}
+.dayb b{font-size:18px;font-weight:700;line-height:1.1}
+.dayb small{font-size:10px;color:var(--ink-3);min-height:13px;line-height:1.3}
+.dayb.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
+.dayb.sel small{color:#fff;opacity:.85}
+@media (max-width:480px){.sky{min-height:98px;padding:10px}.sky b{font-size:14.5px}.sic{font-size:22px}.sky .snow{font-size:19px}.dayb b{font-size:16px}}
 </style>
 </head>
 <body>
@@ -839,14 +869,18 @@ function stepCuisine(){
      <div class="actions">${bk}<button class="btn primary" data-next="4" ${S.cuisines.length?"":"disabled"}>ถัดไป: เลือกเวลา →</button></div>`;
 }
 
+const SKY_IC={now:"⏱️",breakfast:"🌅",lunch:"☀️",afternoon:"☕",dinner:"🌆",late:"🌙",any:"🍽️"};
+function skyCard(m,now,wide){
+  return `<button class="sky s-${m.k} ${wide?"wide":""} ${S.meal===m.k?"sel":""}" data-meal="${m.k}"><span class="sic" aria-hidden="true">${SKY_IC[m.k]}</span>${m.k==="now"?`<span class="snow">${hhmm(now.min)}</span>`:""}<b>${m.lb}</b><span>${m.k==="now"?"เวลาท้องถิ่น":m.sub}</span></button>`;
+}
 function stepTime(){
   const now=placeNow();
   if(S.day===null) S.day=now.day;
   const needDay=S.meal&&!["now","any"].includes(S.meal);
   return head(5,"ไปกินตอนไหน",`เวลา${S.country?"ท้องถิ่นที่"+placeName():"ในเครื่อง"}ตอนนี้ ${DAYS_FULL[now.day]} ${hhmm(now.min)} น. แอปจะเช็กว่าร้านเปิดหรือปิดในเวลาที่เลือก`) +
-  `<div class="grid">${MEALS.map(m=>`<button class="opt pc ${S.meal===m.k?"sel":""}" data-meal="${m.k}">${cover("mw-"+m.k,MEAL_WIKI[m.k][1],MEAL_WIKI[m.k][0],MEAL_WIKI[m.k][1])}<span class="obody"><span class="big">${m.lb}</span><span class="sub">${m.sub}</span></span></button>`).join("")}</div>
+  `<div class="skygrid">${MEALS.filter(m=>m.k!=="any").map(m=>skyCard(m,now)).join("")}</div>${skyCard(MEALS.find(m=>m.k==="any"),now,true)}
    <div class="row-label" ${needDay?"":"hidden"}>วัน</div>
-   <div class="chips" ${needDay?"":"hidden"}>${DAYS.map((d,i)=>`<button class="chip ${S.day===i?"sel":""}" data-day="${i}">${d}${i===now.day?"<small>วันนี้</small>":""}</button>`).join("")}</div>
+   <div class="dayrow" ${needDay?"":"hidden"}>${DAYS.map((d,i)=>`<button class="dayb ${S.day===i?"sel":""}" data-day="${i}"><b>${d}</b><small>${i===now.day?"วันนี้":""}</small></button>`).join("")}</div>
    <div class="actions">${back()}<button class="btn primary" data-next="5" ${S.meal?"":"disabled"}>ดูร้านแนะนำ →</button></div>`;
 }
 
