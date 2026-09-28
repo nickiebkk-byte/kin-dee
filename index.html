@@ -225,6 +225,30 @@ details summary{cursor:pointer;color:var(--violet);font-size:12px;font-weight:60
 .pchip{display:inline-flex;align-items:center;gap:2px}
 .pdel{border:0;background:none;color:var(--ink-3);font-size:18px;line-height:1;padding:0 6px;border-radius:50%}
 .pdel:hover{color:var(--bad)}
+
+/* การ์ดประเทศมีรูป */
+.rowhead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.cgrid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.ccard-wrap{position:relative;min-width:0}
+.ccard{position:relative;display:block;width:100%;max-width:100%;aspect-ratio:4/3;border:0;border-radius:24px;overflow:hidden;padding:0;text-align:left;color:#fff;background:radial-gradient(90% 80% at 100% 0%,rgba(139,92,246,.6),transparent 60%),linear-gradient(160deg,#312e81,#0f172a);box-shadow:var(--depth);transition:transform .15s}
+.ccard:hover{transform:translateY(-2px)}
+.ccard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cshade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,0) 35%,rgba(15,23,42,.88) 100%)}
+.cflag{position:absolute;top:14px;left:16px;font-size:42px;line-height:1}
+.ctext{position:absolute;left:14px;right:14px;bottom:12px;display:flex;flex-direction:column;gap:1px}
+.ctext .big{font-size:21px;font-weight:700;color:#fff;line-height:1.2;text-shadow:0 2px 8px rgba(0,0,0,.35)}
+.ctext .sub{font-size:11px;color:#cbd5e1;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctext .cnt{font-size:12px;color:var(--yellow);font-weight:600}
+.cby{position:absolute;top:8px;left:10px;font-size:9.5px;color:rgba(255,255,255,.8);text-shadow:0 1px 2px rgba(0,0,0,.7);max-width:60%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ccard.add{background:rgba(255,255,255,.55);border:2px dashed #c4b5fd;box-shadow:none}
+.ccard.add .cflag{font-size:26px;color:var(--violet);top:auto;bottom:62px}
+.ccard.add .big{color:var(--violet);text-shadow:none}
+.ccard.add .sub{color:var(--ink-3)}
+.cedit{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:2}
+.cbtn{width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.94);color:var(--ink);display:grid;place-items:center;cursor:pointer;box-shadow:var(--depth-sm);font-size:13px}
+.cbtn.del{color:var(--bad)}
+.xdel{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;border:1px solid var(--cardline);background:#fff;color:var(--bad);display:grid;place-items:center;font-size:12px;z-index:2}
+@media (max-width:480px){.cgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.ctext .big{font-size:17px}.cflag{font-size:34px}}
 </style>
 </head>
 <body>
@@ -402,6 +426,54 @@ try{ myAreas=JSON.parse(localStorage.getItem("kd-areas")||"[]"); }catch(e){}
 let myPlaces=[];
 try{ myPlaces=JSON.parse(localStorage.getItem("kd-places")||"[]"); }catch(e){}
 const savePlaces=()=>{ try{ localStorage.setItem("kd-places",JSON.stringify(myPlaces)); }catch(e){} };
+let myCountries=[], hiddenPresets=[];
+try{ myCountries=JSON.parse(localStorage.getItem("kd-countries")||"[]"); }catch(e){}
+try{ hiddenPresets=JSON.parse(localStorage.getItem("kd-hidden")||"[]"); }catch(e){}
+const saveCountries=()=>{ try{ localStorage.setItem("kd-countries",JSON.stringify(myCountries)); }catch(e){} };
+const saveHidden=()=>{ try{ localStorage.setItem("kd-hidden",JSON.stringify(hiddenPresets)); }catch(e){} };
+// ย้ายสถานที่ที่บันทึกจากเวอร์ชันก่อน เข้าไปอยู่ในการ์ดประเทศ
+if(myPlaces.length){
+  for(const m of myPlaces){
+    const cn=((m.addr||"").split(",").pop()||"").trim()||"อื่น ๆ";
+    let c=myCountries.find(c=>c.name===cn);
+    if(!c){ c={id:"c"+Math.random().toString(36).slice(2,10),name:cn,addr:"",q:cn,lat:m.lat,lng:m.lng,places:[]}; myCountries.push(c); }
+    if(!c.places.some(p=>p.id===m.id)) c.places.push(m);
+  }
+  myPlaces=[]; savePlaces(); saveCountries();
+}
+const FLAGS={jp:"🇯🇵",th:"🇹🇭",kr:"🇰🇷"};
+const PRESET_IMGQ={jp:"Mount Fuji Chureito Pagoda",th:"Wat Arun Bangkok",kr:"Gyeongbokgung Palace Seoul"};
+function IMG(k){ try{ return JSON.parse(localStorage.getItem("kd-img-"+k)||"null"); }catch(e){ return null; } }
+function setIMG(k,v){ try{ v?localStorage.setItem("kd-img-"+k,JSON.stringify(v)):localStorage.removeItem("kd-img-"+k); return true; }catch(e){ return false; } }
+const imgTried=new Set();
+async function fetchCover(key,q){
+  imgTried.add(key);
+  await loadGoogle();
+  const {Place}=await google.maps.importLibrary("places");
+  const r=await Place.searchByText({textQuery:q,fields:["photos"],maxResultCount:1});
+  const ph=r.places&&r.places[0]&&r.places[0].photos&&r.places[0].photos[0];
+  if(!ph) return;
+  setIMG(key,{src:ph.getURI({maxWidth:800,maxHeight:600}),by:ph.authorAttributions&&ph.authorAttributions[0]?ph.authorAttributions[0].displayName:"",g:1});
+}
+function loadCovers(){
+  if(!REAL()) return;
+  const todo=[...Object.keys(COUNTRIES).filter(k=>!hiddenPresets.includes(k)).map(k=>[k,PRESET_IMGQ[k]]),
+    ...myCountries.map(c=>[c.id,c.q+" famous landmark"])].filter(([k])=>!IMG(k)&&!imgTried.has(k));
+  if(!todo.length) return;
+  (async()=>{ for(const [k,q] of todo){ try{ await fetchCover(k,q); }catch(e){} } if(S.step===0) render(); })();
+}
+function resizeImage(file){
+  return new Promise((res,rej)=>{
+    const fr=new FileReader();
+    fr.onerror=()=>rej(new Error("อ่านไฟล์ไม่ได้"));
+    fr.onload=()=>{ const im=new Image(); im.onerror=()=>rej(new Error("ไฟล์นี้ไม่ใช่รูปภาพ"));
+      im.onload=()=>{ const k=Math.min(1,900/Math.max(im.width,im.height)); const cv=document.createElement("canvas");
+        cv.width=Math.round(im.width*k); cv.height=Math.round(im.height*k); cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height);
+        res(cv.toDataURL("image/jpeg",0.78)); };
+      im.src=fr.result; };
+    fr.readAsDataURL(file);
+  });
+}
 const saveFavs=()=>{ try{ localStorage.setItem("kd-favs",JSON.stringify([...favs])); }catch(e){} };
 const saveAreas=()=>{ try{ localStorage.setItem("kd-areas",JSON.stringify(myAreas)); }catch(e){} };
 const NEAR="__near";
@@ -534,10 +606,10 @@ function setLoc(lat,lng,label,extra={}){
 /* ---------- chrome ---------- */
 const STEP_LABELS=["ประเทศ","เมือง","ย่าน","ประเภท","เวลา","ผลลัพธ์"];
 function renderChrome(){
-  const reach=[true,!!S.country,!!S.city,!!S.area,S.cuisines.length>0,S.meal!==null];
+  const reach=[true,!!(S.country||S.ucountry),!!S.city,!!S.area,S.cuisines.length>0,S.meal!==null];
   $("#steps").innerHTML=STEP_LABELS.map((l,i)=>{
     const cls=i===S.step?"cur":(i<S.step?"done":"");
-    const can=(i<=S.step||reach.slice(0,i+1).every(Boolean)) && !(i===1&&!S.country) && !(i===2&&!S.city);
+    const can=(i<=S.step||reach.slice(0,i+1).every(Boolean)) && !(i===1&&!S.country&&!S.ucountry) && !(i===2&&!S.city);
     return `<button class="st ${cls}" data-go="${i}" ${can?"":"disabled"} aria-label="ขั้นที่ ${i+1} ${l}"><span class="bar"></span><span class="lb">${i+1} ${l}</span></button>`;
   }).join("");
   $("#modeLbl").innerHTML = REAL() ? `<span class="live">LIVE · GOOGLE PLACES</span>` : `ยังไม่ได้ใส่ API KEY`;
@@ -548,8 +620,8 @@ function mealText(){
   return `${DAYS_FULL[S.day]} ${MEALS.find(m=>m.k===S.meal).t}`;
 }
 function go(i){
-  if(i===1&&!S.country) i=0;
-  if(i===2&&!S.city) i=S.country?1:0;
+  if(i===1&&!S.country&&!S.ucountry) i=0;
+  if(i===2&&!S.city) i=(S.country||S.ucountry)?1:0;
   S.step=i; render(); window.scrollTo({top:0,behavior:"smooth"});
 }
 
@@ -576,6 +648,7 @@ function settingsPanel(){
 function crumbList(){
   const cr=[];
   if(S.country) cr.push(COUNTRIES[S.country].name);
+  else if(S.ucountry){ const c=myCountries.find(c=>c.id===S.ucountry); if(c) cr.push(c.name); }
   if(S.city) cr.push(cityOf(S.country,S.city).name);
   if(S.area) cr.push(curArea().th);
   if(S.cuisines.length) cr.push(cuisineText());
@@ -583,7 +656,7 @@ function crumbList(){
   return cr;
 }
 function hero(kick,title,sub,icon){
-  const cr=crumbList();
+  const cr=S.step===0?[]:crumbList();
   return `<section class="hero"><i class="fa-solid ${icon||"fa-bowl-food"} hero-ico" aria-hidden="true"></i>
     <div class="kick"><i class="fa-solid fa-star"></i> ${kick}</div><h2>${title}</h2>${sub?`<p>${sub}</p>`:""}
     ${cr.length?`<div class="pills">${cr.map((c,i)=>`<span class="${i===cr.length-1?"hl":""}">${esc(c)}</span>`).join("")}</div>`:""}</section>`;
@@ -597,21 +670,48 @@ function gpsCard(){
     ${S.locErr&&S.step===0?`<p class="err">${esc(S.locErr)}</p>`:""}`;
 }
 function stepCountry(){
-  return head(1,"อยากไปกินที่ไหนดี","ใช้ตำแหน่งปัจจุบัน หรือเลือกประเทศ เมือง และย่านเอง") + gpsCard() + `<div class="row-label">หรือเลือกประเทศ</div>` +
-  `<div class="grid">${Object.entries(COUNTRIES).map(([k,c])=>{
-    return `<button class="opt ${S.country===k?"sel":""}" data-country="${k}"><span class="big">${c.name}</span><span class="sub">${c.en} · ${Object.keys(c.cities).length} เมือง</span><span class="cnt">${Object.values(c.cities).reduce((s,ci)=>s+Object.keys(ci.areas).length,0)} ย่าน</span></button>`;
-  }).join("")}</div>` + addPlacePanel();
+  const presets=Object.entries(COUNTRIES).filter(([k])=>!hiddenPresets.includes(k));
+  setTimeout(loadCovers,0);
+  return head(1,"อยากไปกินที่ไหนดี","ใช้ตำแหน่งปัจจุบัน หรือเลือกประเทศ เมือง และย่านเอง") + gpsCard() +
+  `<div class="rowhead"><span class="row-label">ประเทศของฉัน</span><button class="tg ${S.editCards?"sel":""}" data-editcards="1">${S.editCards?"เสร็จ":`<i class="fa-solid fa-pen"></i> จัดการการ์ด`}</button></div>
+  <div class="grid cgrid">${presets.map(([k,c])=>coverCard({key:k,name:c.name,sub:c.en,
+      cnt:`${Object.keys(c.cities).length} เมือง · ${Object.values(c.cities).reduce((s,ci)=>s+Object.keys(ci.areas).length,0)} ย่าน`,attrs:`data-country="${k}"`,flag:FLAGS[k],del:"hidepreset"})).join("")}
+    ${myCountries.map(c=>coverCard({key:c.id,name:c.name,sub:c.addr&&c.addr!==c.name?c.addr:"เพิ่มเอง",cnt:`${c.places.length} ที่บันทึกไว้`,attrs:`data-ucountry="${c.id}"`,del:"delcountry"})).join("")}
+    <button class="ccard add" data-addcountry="1"><span class="cflag"><i class="fa-solid fa-plus"></i></span><span class="ctext"><span class="big">เพิ่มประเทศ</span><span class="sub">หรือเมือง · ค้นจาก Google</span></span></button></div>
+  ${S.editCards?`<p class="hint">กด <i class="fa-solid fa-camera"></i> เปลี่ยนรูปจากเครื่อง · <i class="fa-solid fa-image"></i> ลบรูป · <i class="fa-solid fa-trash"></i> ลบการ์ด</p>`:""}
+  ${S.editCards&&hiddenPresets.length?`<button class="btn" data-restore="1">คืนการ์ดที่ซ่อนไว้ (${hiddenPresets.length})</button>`:""}
+  ${S.adding?searchPanel("เพิ่มประเทศ / เมือง","พิมพ์ชื่อประเทศหรือเมือง เช่น Vietnam, Taiwan, Kyoto, Paris","เช่น Vietnam, Singapore, Kyoto"):""}`;
 }
-function addPlacePanel(){
+function coverCard({key,name,sub,cnt,attrs,flag,del}){
+  const im=IMG(key);
+  return `<div class="ccard-wrap"><button class="ccard" ${attrs}>
+    ${im?`<img src="${esc(im.src)}" alt="" loading="lazy" data-imgkey="${esc(key)}">`:`<span class="cflag" aria-hidden="true">${flag||'<i class="fa-solid fa-earth-asia"></i>'}</span>`}
+    <span class="cshade"></span>
+    ${im&&im.g&&im.by?`<span class="cby">รูป: ${esc(im.by)} · Google</span>`:""}
+    <span class="ctext"><span class="big">${esc(name)}</span><span class="sub">${esc(sub)}</span><span class="cnt">${esc(cnt)}</span></span>
+  </button>
+  ${S.editCards?`<div class="cedit"><label class="cbtn" title="เปลี่ยนรูป"><i class="fa-solid fa-camera"></i><input type="file" accept="image/*" data-upimg="${esc(key)}" hidden></label>${im?`<button class="cbtn" data-rmimg="${esc(key)}" title="ลบรูป" aria-label="ลบรูป"><i class="fa-solid fa-image"></i></button>`:""}<button class="cbtn del" data-${del}="${esc(key)}" title="ลบการ์ด" aria-label="ลบการ์ด ${esc(name)}"><i class="fa-solid fa-trash"></i></button></div>`:""}
+  </div>`;
+}
+function searchPanel(title,sub,ph){
   const hits=S.placeHits||[];
   return `<section class="locbox">
-    <div class="loc-h"><b><i class="fa-solid fa-earth-americas"></i> เพิ่มประเทศ / เมืองอื่น</b><span>พิมพ์ชื่อเมือง ย่าน หรือสถานที่ได้ทุกประเทศ เช่น Kyoto, Paris Le Marais, Taipei 101 แล้วแอปจะค้นร้านรอบจุดนั้น</span></div>
-    ${myPlaces.length?`<div class="chips">${myPlaces.map(m=>`<span class="pchip"><button class="chip mine" data-myplace="${esc(m.id)}"><i class="fa-solid fa-location-dot"></i> ${esc(m.name)}</button><button class="pdel" data-delplace="${esc(m.id)}" aria-label="ลบ ${esc(m.name)}">×</button></span>`).join("")}</div>`:""}
-    <div class="locin"><input id="placeq" type="text" autocomplete="off" placeholder="เช่น Kyoto, Singapore, Hong Kong Mong Kok" aria-label="ชื่อเมืองหรือสถานที่"><button class="btn primary" data-placego="1" ${S.placeBusy?"disabled":""}>${S.placeBusy?"กำลังค้น…":`<i class="fa-solid fa-magnifying-glass"></i> ค้นหา`}</button></div>
+    <div class="loc-h"><b><i class="fa-solid fa-earth-americas"></i> ${title}</b><span>${sub}</span></div>
+    <div class="locin"><input id="placeq" type="text" autocomplete="off" placeholder="${ph}" aria-label="${title}"><button class="btn primary" data-placego="1" ${S.placeBusy?"disabled":""}>${S.placeBusy?"กำลังค้น…":`<i class="fa-solid fa-magnifying-glass"></i> ค้นหา`}</button></div>
     ${!REAL()?`<p class="err">ต้องใส่ Google API key ก่อน (ปุ่มเฟืองด้านบน)</p>`:""}
     ${S.placeErr?`<p class="err">${esc(S.placeErr)}</p>`:""}
-    ${hits.length?`<div class="grid">${hits.map((h,i)=>`<button class="opt" data-hit="${i}"><span class="big">${esc(h.name)}</span><span class="desc">${esc(h.addr)}</span><span class="cnt">เลือกและค้นร้านรอบนี้ →</span></button>`).join("")}</div>`:""}
+    ${hits.length?`<div class="grid">${hits.map((h,i)=>`<button class="opt" data-hit="${i}"><span class="big">${esc(h.name)}</span><span class="desc">${esc(h.addr)}</span><span class="cnt">+ เพิ่มอันนี้</span></button>`).join("")}</div>`:""}
   </section>`;
+}
+function stepUCity(){
+  const c=myCountries.find(c=>c.id===S.ucountry);
+  if(!c){ S.ucountry=null; S.step=0; return stepCountry(); }
+  return head(2,`ไปที่ไหนใน${esc(c.name)}`,"เลือกเมืองหรือย่านที่บันทึกไว้ หรือเพิ่มใหม่ด้านล่าง") +
+  `<div class="grid">
+    <button class="opt near" data-ucenter="1"><span class="big">ทั่ว${esc(c.name)}</span><span class="desc">ค้นร้านรอบจุดกลางของ${esc(c.name)}</span><span class="cnt">รัศมี 5 กม.</span></button>
+    ${c.places.map(p=>`<div class="ccard-wrap"><button class="opt" data-uplace="${esc(p.id)}"><span class="big">${esc(p.name)}</span><span class="desc">${esc(p.addr)}</span><span class="cnt">ค้นร้านรอบนี้ →</span></button><button class="xdel" data-delplace="${esc(p.id)}" aria-label="ลบ ${esc(p.name)}"><i class="fa-solid fa-xmark"></i></button></div>`).join("")}
+  </div>` + searchPanel(`เพิ่มเมือง / ย่านใน${esc(c.name)}`,"พิมพ์ชื่อเมือง ย่าน หรือสถานที่ แล้วเลือกผลที่ตรง","เช่น ชื่อเมือง ย่าน หรือสถานที่ดัง") +
+  `<div class="actions"><button class="btn ghost" data-go="0">← ย้อนกลับ</button></div>`;
 }
 function stepCity(){
   const co=COUNTRIES[S.country];
@@ -775,7 +875,7 @@ function cardReal(x,i){
 /* ---------- render + events ---------- */
 function render(){
   renderChrome();
-  const fns=[stepCountry,stepCity,stepArea,stepCuisine,stepTime,stepResults];
+  const fns=[stepCountry,()=>S.ucountry&&!S.country?stepUCity():stepCity(),stepArea,stepCuisine,stepTime,stepResults];
   $("#stage").innerHTML=(S.settings?settingsPanel():"")+fns[S.step]();
   $("#setBtn").classList.toggle("sel",S.settings);
 }
@@ -787,21 +887,40 @@ document.addEventListener("click",e=>{
   if(d.delkey){ try{ localStorage.removeItem("kd-key"); }catch(err){} location.reload(); return; }
   if(d.go!==undefined){ go(+d.go); return; }
   if(d.gps){ useGPS(); return; }
+  if(d.editcards){ S.editCards=!S.editCards; render(); return; }
+  if(d.hidepreset){ hiddenPresets.push(d.hidepreset); saveHidden(); render(); return; }
+  if(d.restore){ hiddenPresets=[]; saveHidden(); render(); return; }
+  if(d.delcountry){ myCountries=myCountries.filter(c=>c.id!==d.delcountry); saveCountries(); setIMG(d.delcountry,null); render(); return; }
+  if(d.rmimg){ setIMG(d.rmimg,null); imgTried.add(d.rmimg); render(); return; }
+  if(d.addcountry){ S.adding=!S.adding; S.placeHits=[]; S.placeErr=""; render(); const i=$("#placeq"); if(i){ i.focus(); i.scrollIntoView({block:"center",behavior:"smooth"}); } return; }
+  if(d.ucountry){ if(S.editCards) return; Object.assign(S,{ucountry:d.ucountry,country:null,city:null,area:null,cuisines:[],placeHits:[],placeErr:""}); go(1); return; }
+  if(d.ucenter){ const c=myCountries.find(c=>c.id===S.ucountry); if(c){ S.radius=5; applyPoint(c.lat,c.lng,c.name); } return; }
+  if(d.uplace){ const c=myCountries.find(c=>c.id===S.ucountry), p=c&&c.places.find(p=>p.id===d.uplace); if(p){ S.radius=Math.max(S.radius,3); applyPoint(p.lat,p.lng,p.name); } return; }
+  if(d.delplace){ const c=myCountries.find(c=>c.id===S.ucountry); if(c){ c.places=c.places.filter(p=>p.id!==d.delplace); saveCountries(); } render(); return; }
   if(d.placego){
-    const q=$("#placeq").value.trim(); if(!q){ S.placeErr="พิมพ์ชื่อเมืองหรือสถานที่ก่อน"; render(); return; }
+    const q=$("#placeq").value.trim(); if(!q){ S.placeErr="พิมพ์ชื่อก่อน"; render(); return; }
     if(!REAL()){ S.settings=true; render(); return; }
+    const c=S.ucountry&&S.step===1?myCountries.find(c=>c.id===S.ucountry):null;
     S.placeBusy=true; S.placeErr=""; S.placeHits=[]; render();
-    findPlaces(q).then(h=>{ S.placeHits=h; if(!h.length) S.placeErr="ไม่พบสถานที่นี้ ลองพิมพ์เป็นภาษาอังกฤษ หรือใส่ชื่อประเทศต่อท้าย"; })
+    findPlaces(c?`${q}, ${c.q}`:q).then(h=>{ S.placeHits=h; if(!h.length) S.placeErr="ไม่พบ ลองพิมพ์เป็นภาษาอังกฤษ"; })
       .catch(e=>{ S.placeErr="ค้นหาไม่สำเร็จ: "+(e&&e.message?e.message:e); })
       .finally(()=>{ S.placeBusy=false; render(); const i=$("#placeq"); if(i) i.value=q; });
     return;
   }
-  if(d.hit!==undefined){ const h=S.placeHits[+d.hit]; if(!h) return;
-    myPlaces=[h,...myPlaces.filter(m=>m.id!==h.id)].slice(0,12); savePlaces(); S.placeHits=[]; S.radius=Math.max(S.radius,3);
-    applyPoint(h.lat,h.lng,h.name); return; }
-  if(d.myplace){ const m=myPlaces.find(m=>m.id===d.myplace); if(m){ S.radius=Math.max(S.radius,3); applyPoint(m.lat,m.lng,m.name); } return; }
-  if(d.delplace){ myPlaces=myPlaces.filter(m=>m.id!==d.delplace); savePlaces(); render(); return; }
-  if(d.country){ if(S.country!==d.country){S.city=S.area=null;S.cuisines=[];S.day=null;} S.country=d.country; const cs=Object.keys(COUNTRIES[d.country].cities); if(cs.length===1){S.city=cs[0];go(2);} else go(1); return; }
+  if(d.hit!==undefined){
+    const h=(S.placeHits||[])[+d.hit]; if(!h) return;
+    S.placeHits=[];
+    if(S.step===1&&S.ucountry){
+      const c=myCountries.find(c=>c.id===S.ucountry);
+      if(c&&!c.places.some(p=>p.id===h.id)){ c.places.unshift(h); saveCountries(); }
+      render(); return;
+    }
+    let c=myCountries.find(c=>c.pid===h.id);
+    if(!c){ c={id:"c"+Math.random().toString(36).slice(2,10),pid:h.id,name:h.name,addr:h.addr,q:h.name,lat:h.lat,lng:h.lng,places:[]}; myCountries.push(c); saveCountries();
+      fetchCover(c.id,c.q+" famous landmark").catch(()=>{}); }
+    S.adding=false; Object.assign(S,{ucountry:c.id,country:null,city:null,area:null,cuisines:[]}); go(1); return;
+  }
+  if(d.country){ if(S.editCards) return; S.ucountry=null; if(S.country!==d.country){S.city=S.area=null;S.cuisines=[];S.day=null;} S.country=d.country; const cs=Object.keys(COUNTRIES[d.country].cities); if(cs.length===1){S.city=cs[0];go(2);} else go(1); return; }
   if(d.city){ if(S.city!==d.city){S.area=null;S.cuisines=[];} S.city=d.city; go(2); return; }
   if(d.area){ if(S.area!==d.area) S.cuisines=[]; S.area=d.area; go(3); return; }
   if(d.asort){ S.areaSort=d.asort; render(); return; }
@@ -831,7 +950,7 @@ document.addEventListener("click",e=>{
   if(d.flip){ S[d.flip]=!S[d.flip]; S.show=10; render(); return; }
   if(d.more){ S.show+=10; render(); return; }
   if(d.fav){ favs.has(d.fav)?favs.delete(d.fav):favs.add(d.fav); saveFavs(); render(); return; }
-  if(d.reset){ Object.assign(S,{step:0,country:null,city:null,area:null,cuisines:[],day:null,meal:null,minR:0,resOnly:false,openOnly:false,sort:"smart",areaSort:null,locMove:null,show:10}); render(); return; }
+  if(d.reset){ Object.assign(S,{ucountry:null,editCards:false,adding:false,step:0,country:null,city:null,area:null,cuisines:[],day:null,meal:null,minR:0,resOnly:false,openOnly:false,sort:"smart",areaSort:null,locMove:null,show:10}); render(); return; }
   if(d.copy){
     const done=()=>{ b.textContent="คัดลอกแล้ว"; setTimeout(()=>b.textContent="คัดลอก",1500); };
     try{ navigator.clipboard.writeText(d.copy).then(done,()=>selectText(b)); }catch(err){ selectText(b); }
@@ -848,6 +967,15 @@ document.addEventListener("input",e=>{
   document.querySelectorAll("#areagrid .opt").forEach(o=>{ const hit=!q||o.dataset.text.includes(q); o.hidden=!hit; if(hit) shown++; });
   $("#areaempty").hidden=shown>0;
 });
+document.addEventListener("change",e=>{
+  const k=e.target.dataset&&e.target.dataset.upimg; if(!k||!e.target.files[0]) return;
+  resizeImage(e.target.files[0]).then(src=>{ if(!setIMG(k,{src,by:"",g:0})) alert("พื้นที่เก็บรูปในเบราว์เซอร์เต็ม ลองลบรูปการ์ดอื่นก่อน"); render(); })
+    .catch(err=>{ S.placeErr=err.message; render(); });
+});
+document.addEventListener("error",e=>{
+  const k=e.target&&e.target.dataset&&e.target.dataset.imgkey; if(!k) return;
+  setIMG(k,null); imgTried.add(k); render();
+},true);
 function selectText(b){ const el=b.previousElementSibling; const r=document.createRange(); r.selectNodeContents(el); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
 
 if(!REAL()) S.settings=true;
