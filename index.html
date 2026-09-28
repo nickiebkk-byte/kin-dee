@@ -315,6 +315,45 @@ details summary{cursor:pointer;color:var(--violet);font-size:12px;font-weight:60
 .dayb.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
 .dayb.sel small{color:#fff;opacity:.85}
 @media (max-width:480px){.sky{min-height:98px;padding:10px}.sky b{font-size:14.5px}.sic{font-size:22px}.sky .snow{font-size:19px}.dayb b{font-size:16px}}
+
+/* ===== รูปประเทศที่อยู่ตอนนี้ ในการ์ดหัวข้อหน้าแรก ===== */
+.hero.hasimg{min-height:230px}
+.hero-bg{position:absolute;inset:0;z-index:0;overflow:hidden;border-radius:inherit}
+.hero-bg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,23,42,.15) 0%,rgba(15,23,42,.55) 55%,rgba(15,23,42,.92) 100%)}
+.hero-bg .ocred{top:10px;right:14px;left:auto;bottom:auto;z-index:1}
+.hero>*:not(.hero-bg){position:relative;z-index:1}
+.hero.hasimg .hero-ico{display:none}
+.here{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font-size:12.5px;font-weight:600;padding:3px 12px;border-radius:999px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(6px)}
+/* ===== ขนาดจอ iPhone / iPad ===== */
+html,body{-webkit-tap-highlight-color:transparent}
+input,select,textarea{font-size:16px!important}
+@media (min-width:700px){
+  body{font-size:16px;padding-inline:24px}
+  .top{margin-inline:-24px;padding-inline:24px}
+  .wrap,.top-in{max-width:980px}
+  .stage{gap:16px;padding-top:20px}
+  .hero{min-height:200px;padding:28px 28px 26px;border-radius:32px}
+  .hero.hasimg{min-height:320px}
+  .hero h2{font-size:clamp(34px,4.6vw,46px)}
+  .hero p{font-size:16px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+  .cgrid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+  .skygrid{gap:14px}
+  .sky{min-height:140px;padding:16px}
+  .sky b{font-size:19px}.sky span{font-size:13.5px}.sic{font-size:32px}.sky .snow{font-size:28px}
+  .dayrow{gap:10px}.dayb{padding:14px 0 10px}.dayb b{font-size:20px}
+  .gps{padding:22px}
+  .list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+  .rph{width:128px;height:128px}
+  .rinfo h3{font-size:19px}
+  .steps .lb{font-size:12px}
+  .brand h1{font-size:22px}
+}
+@media (min-width:1100px){
+  .wrap,.top-in{max-width:1100px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+}
 </style>
 </head>
 <body>
@@ -525,6 +564,18 @@ const FOOD_Q={ramen:"tonkotsu ramen bowl",sushi:"sushi omakase counter",grill:"y
   okonomi:"okonomiyaki teppan",donburi:"kaisendon rice bowl",yoshoku:"japanese curry omurice",fine:"kaiseki fine dining",thai:"thai food pad thai tom yum",
   korean:"korean bbq samgyeopsal",seafood:"seafood crab lobster",street:"street food night market",cafe:"specialty coffee cafe latte art",dessert:"parfait dessert cafe"};
 const coverQ=[], coverQueued=new Set(); let coverActive=0;
+// ประเทศที่ผู้ใช้อยู่ตอนนี้: ใช้ GPS ถ้ามี ไม่งั้นเดาจากเขตเวลาของเครื่อง
+const TZ_PRESET={"Asia/Tokyo":"jp","Asia/Bangkok":"th","Asia/Seoul":"kr"};
+const PRESET_WIKI={jp:"Tokyo",th:"Bangkok",kr:"Seoul"};
+function hereInfo(){
+  if(S.loc){ const nc=nearestCity([S.loc.lat,S.loc.lng]); if(nc&&nc.d<60) return {k:nc.co,name:COUNTRIES[nc.co].name}; }
+  let tz=""; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone||""; }catch(e){}
+  if(TZ_PRESET[tz]) return {k:TZ_PRESET[tz],name:COUNTRIES[TZ_PRESET[tz]].name};
+  const city=(tz.split("/").pop()||"").replace(/_/g," ");
+  return city?{k:null,city,name:city}:null;
+}
+function heroCover(key,q,wiki){ want(key,q,wiki); const im=IMG(key);
+  return `<span class="hero-bg" data-cover="${esc(key)}">${im?coverImgHTML(key,im):""}</span>`; }
 const FOOD_WIKI={ramen:"Ramen",sushi:"Sushi",grill:"Yakiniku",izakaya:"Yakitori",fried:"Tonkatsu",okonomi:"Okonomiyaki",donburi:"Donburi",
   yoshoku:"Japanese_curry",fine:"Kaiseki",thai:"Pad_thai",korean:"Samgyeop-sal",seafood:"Chilli_crab",street:"Street_food",cafe:"Latte_art",dessert:"Parfait"};
 // รูปจาก Wikipedia (ฟรี) ถ้าไม่มีค่อยใช้รูปจาก Google
@@ -550,6 +601,11 @@ function pumpCovers(){
     const job=wiki ? fetchWiki(k,wiki).catch(()=>false).then(ok=>ok||!REAL()?null:fetchCover(k,q)) : fetchCover(k,q);
     job.catch(()=>{}).finally(()=>{ coverActive--; paintCover(k); pumpCovers(); });
   }
+}
+function heroHome(){
+  const h=hereInfo(); if(!h) return {bg:"",here:""};
+  const bg=h.k ? heroCover(h.k,PRESET_IMGQ[h.k],PRESET_WIKI[h.k]) : heroCover("hw-"+h.city,h.city+" city",h.city.replace(/ /g,"_"));
+  return {bg,here:`คุณอยู่ที่${esc(h.name)}`};
 }
 function coverImgHTML(key,im){ return `<img src="${esc(im.src)}" alt="" loading="lazy" data-imgkey="${esc(key)}">${im.w?`<span class="ocred">รูป: Wikipedia</span>`:im.g&&im.by?`<span class="ocred">รูป: ${esc(im.by)} · Google</span>`:""}`; }
 function paintCover(k){ const im=IMG(k); if(!im) return; document.querySelectorAll(`[data-cover="${k}"]`).forEach(el=>{ el.innerHTML=coverImgHTML(k,im); }); }
@@ -755,9 +811,9 @@ function crumbList(){
   if(S.meal) cr.push(mealText());
   return cr;
 }
-function hero(kick,title,sub,icon){
+function hero(kick,title,sub,icon,bg,here){
   const cr=S.step===0?[]:crumbList();
-  return `<section class="hero"><i class="fa-solid ${icon||"fa-bowl-food"} hero-ico" aria-hidden="true"></i>
+  return `<section class="hero ${bg?"hasimg":""}">${bg||""}<i class="fa-solid ${icon||"fa-bowl-food"} hero-ico" aria-hidden="true"></i>${here?`<span class="here"><i class="fa-solid fa-location-dot"></i> ${here}</span>`:""}
     <div class="kick"><i class="fa-solid fa-star"></i> ${kick}</div><h2>${title}</h2>${sub?`<p>${sub}</p>`:""}
     ${cr.length?`<div class="pills">${cr.map((c,i)=>`<span class="${i===cr.length-1?"hl":""}">${esc(c)}</span>`).join("")}</div>`:""}</section>`;
 }
@@ -772,7 +828,8 @@ function gpsCard(){
 function stepCountry(){
   const presets=Object.entries(COUNTRIES).filter(([k])=>!hiddenPresets.includes(k));
   setTimeout(loadCovers,0);
-  return head(1,"อยากไปกินที่ไหนดี","ใช้ตำแหน่งปัจจุบัน หรือเลือกประเทศ เมือง และย่านเอง") + gpsCard() +
+  const hh=heroHome();
+  return hero("ขั้นที่ 1 / 5","อยากไปกินที่ไหนดี","ใช้ตำแหน่งปัจจุบัน หรือเลือกประเทศ เมือง และย่านเอง","fa-earth-asia",hh.bg,hh.here) + gpsCard() +
   `<div class="rowhead"><span class="row-label">ประเทศของฉัน</span><button class="tg ${S.editCards?"sel":""}" data-editcards="1">${S.editCards?"เสร็จ":`<i class="fa-solid fa-pen"></i> จัดการการ์ด`}</button></div>
   <div class="grid cgrid">${presets.map(([k,c])=>coverCard({key:k,name:c.name,sub:c.en,
       cnt:`${Object.keys(c.cities).length} เมือง · ${Object.values(c.cities).reduce((s,ci)=>s+Object.keys(ci.areas).length,0)} ย่าน`,attrs:`data-country="${k}"`,flag:FLAGS[k],del:"hidepreset"})).join("")}
