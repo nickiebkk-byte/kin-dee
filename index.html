@@ -2,90 +2,803 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f1eeff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="กินไหนดี">
 <title>กินไหนดี</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDxrYqPObgMmCMMxzZniqFJ27q7XCi83SA&libraries=places&loading=async"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-:root{--bg:#f7f5ef;--card:#fff;--ink:#101010;--muted:#827e75;--line:#ddd8cc;--yellow:#ffd43b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Prompt,sans-serif}
-.top{position:sticky;top:0;z-index:10;background:rgba(247,245,239,.95);backdrop-filter:blur(12px);border-bottom:1px solid #e6e1d7}
-.topin{max-width:980px;margin:auto;padding:18px 22px;display:flex;justify-content:space-between;align-items:center;gap:16px}
-.logo{font-size:38px;font-weight:800;letter-spacing:-2px}.logo b{background:var(--yellow);padding:2px 7px}.live{font-size:13px;color:#6f6a61;text-align:right}
-main{max-width:980px;margin:auto;padding:26px 22px 80px}.step{font-weight:700;color:#8b7512;font-size:14px}.hero h1{font-size:clamp(34px,8vw,58px);line-height:1.06;margin:8px 0 12px;letter-spacing:-2px}.hero p{margin:0 0 28px;color:#6f6a61;font-size:17px}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:22px;min-height:170px;box-shadow:0 2px 0 rgba(0,0,0,.03)}
-button.card{font:inherit;text-align:left;color:inherit;cursor:pointer}.card:hover,.card.sel{border-color:#111;box-shadow:0 0 0 1px #111}.big{display:block;font-size:23px;font-weight:800}.sub{display:block;color:#8a867e;margin-top:4px}.desc{display:block;color:#5f5b54;margin-top:18px;font-size:14px}
-.actions{display:flex;gap:10px;justify-content:space-between;margin-top:22px}.btn{border:1px solid #111;background:#fff;border-radius:999px;padding:13px 18px;font:600 14px Prompt;cursor:pointer}.primary{background:#111;color:#fff}
-.chips{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0 24px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 14px;font:600 14px Prompt}.chip.sel{background:#111;color:#fff;border-color:#111}
-.result{background:#fff;border:1px solid var(--line);border-radius:24px;padding:18px;margin-bottom:12px}.rhead{display:flex;gap:12px;justify-content:space-between}.rname{font-size:20px;font-weight:800}.score{font-weight:800;font-size:20px;white-space:nowrap}.meta,.addr,.hours{color:#6f6a61;font-size:13px;margin-top:6px}.tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.tag{background:#f1efe9;border-radius:999px;padding:6px 9px;font-size:12px}.links{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.links a{color:#111;text-decoration:none;border:1px solid #111;border-radius:999px;padding:8px 11px;font-size:12px;font-weight:700}
-.loading,.empty{padding:35px;text-align:center;border:1px dashed #bbb4a8;border-radius:22px;color:#706b63}.error{background:#fff2f0;border:1px solid #efb3ab;padding:16px;border-radius:18px;color:#8b2f25}.note{font-size:12px;color:#888278;margin-top:18px}
-@media(max-width:600px){.topin{padding:16px 18px}.logo{font-size:34px}main{padding:24px 18px 70px}.grid{grid-template-columns:1fr 1fr;gap:12px}.card{padding:18px;min-height:155px}.big{font-size:20px}.hero h1{font-size:43px}.live{max-width:145px}}
-@media(max-width:370px){.grid{grid-template-columns:1fr}.live{display:none}}
+/* ===== MY TRIP theme: Lavender + การ์ดมีมิติ ===== */
+:root{
+  color-scheme:light;
+  --bg:#f1eeff; --blob1:#ddd6fe; --blob2:#fbcfe8; --blob3:#e0e7ff;
+  --card:#ffffff; --inner:#f7f5ff; --cardline:#e7e1fb; --line:#e2dbfb;
+  --glass:rgba(241,238,255,.82);
+  --ink:#1e293b; --ink-2:#475569; --ink-3:#94a3b8; --text:#334155;
+  --blue:#2563eb; --blue-a:#3b82f6; --blue-b:#1d4ed8; --blue-soft:#dbeafe;
+  --yellow:#facc15; --yellow-a:#fde047; --amber:#fcd34d;
+  --violet:#6d28d9; --violet-soft:#ede9fe;
+  --ok:#059669; --ok-soft:#d1fae5; --warn:#b45309; --warn-soft:#fef3c7; --bad:#dc2626; --bad-soft:#fee2e2;
+  --shadow:rgba(109,40,217,.20); --heroshadow:rgba(76,29,149,.55);
+  --depth:0 1px 0 rgba(255,255,255,.8) inset,0 1px 2px rgba(15,23,42,.05),0 6px 14px -6px rgba(15,23,42,.10),0 22px 40px -18px var(--shadow);
+  --depth-sm:0 1px 0 rgba(255,255,255,.9) inset,0 3px 8px -4px rgba(15,23,42,.12);
+  --f:"Prompt",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;letter-spacing:-.01em}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f);font-size:15px;line-height:1.55;padding-inline:14px;padding-block:0 calc(56px + env(safe-area-inset-bottom,0px));-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;
+  background:radial-gradient(40% 30% at 15% 10%,var(--blob1),transparent 70%),radial-gradient(45% 35% at 90% 35%,var(--blob2),transparent 70%),radial-gradient(40% 30% at 30% 85%,var(--blob3),transparent 70%)}
+img{max-width:100%}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto}
+
+/* header */
+.top{position:sticky;top:0;z-index:20;margin-inline:-14px;padding:max(10px,env(safe-area-inset-top,0px)) 14px 10px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);box-shadow:0 1px 0 var(--line),0 10px 30px -18px rgba(15,23,42,.35)}
+.top-in{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.logo{display:flex;align-items:center;gap:10px;min-width:0}
+.logo-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:#fff;background:linear-gradient(160deg,var(--blue-a),var(--blue-b));box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 10px 20px -10px rgba(37,99,235,.7);flex:none}
+.brand h1{margin:0;font-size:19px;font-weight:700;color:var(--ink);line-height:1.1}
+.brand h1 span{background:var(--yellow);padding:0 6px;border-radius:6px;margin-left:2px}
+.sample{font-size:10.5px;font-weight:600;color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.live{color:var(--ok)}
+.live::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);margin-right:5px;vertical-align:middle;box-shadow:0 0 0 3px var(--ok-soft)}
+.brand-r{display:flex;align-items:center;gap:8px}
+.setbtn{width:36px;height:36px;border-radius:50%;border:0;background:#fff;color:var(--ink-2);display:grid;place-items:center;box-shadow:var(--depth-sm)}
+.setbtn.sel{background:var(--ink);color:#fff}
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+.st{display:flex;flex-direction:column;gap:4px;background:none;border:0;padding:0;text-align:left;min-width:0}
+.st .bar{height:5px;border-radius:3px;background:#ddd6fe}
+.st.done .bar{background:var(--blue)}
+.st.cur .bar{background:var(--yellow);box-shadow:0 0 0 1px #eab308 inset}
+.st .lb{font-size:10.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st.done .lb{color:var(--ink-2)}
+.st.cur .lb{color:var(--ink);font-weight:700}
+.st:disabled{cursor:default}
+.crumbs{display:none}
+
+/* stage */
+.stage{padding-top:16px;display:flex;flex-direction:column;gap:14px}
+
+/* hero (การ์ดมืดแบบ MY TRIP) */
+.hero{position:relative;overflow:hidden;border-radius:28px;padding:22px 20px 20px;color:#fff;min-height:170px;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;
+  background:radial-gradient(120% 90% at 100% 0%,rgba(139,92,246,.55),transparent 55%),radial-gradient(90% 80% at 0% 100%,rgba(37,99,235,.45),transparent 60%),linear-gradient(160deg,#1e1b4b,#0f172a);
+  box-shadow:0 2px 4px rgba(15,23,42,.12),0 28px 50px -20px var(--heroshadow)}
+.hero::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 0 0 1px rgba(255,255,255,.08)}
+.hero-ico{position:absolute;right:-8px;top:-10px;font-size:120px;color:rgba(255,255,255,.07);transform:rotate(-12deg);pointer-events:none}
+.kick{font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);display:flex;align-items:center;gap:6px}
+.kick i{font-size:9px}
+.hero h2{margin:0;font-size:clamp(26px,7vw,36px);font-weight:700;line-height:1.15;text-wrap:balance;text-shadow:0 2px 10px rgba(0,0,0,.25)}
+.hero h2 em{font-style:normal;color:var(--yellow)}
+.hero p{margin:0;color:#cbd5e1;font-size:14px;max-width:60ch}
+.pills{display:flex;flex-wrap:wrap;gap:6px;padding-top:6px}
+.pills span{font-size:12px;font-weight:500;padding:2px 11px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.2);color:#e2e8f0;backdrop-filter:blur(6px)}
+.pills span.hl{color:var(--yellow);font-weight:700}
+
+/* option cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.opt{position:relative;display:flex;flex-direction:column;gap:2px;text-align:left;background:var(--card);border:1px solid var(--cardline);border-radius:22px;padding:16px 16px 14px;box-shadow:var(--depth);transition:transform .15s,box-shadow .15s}
+.opt:hover{transform:translateY(-2px)}
+.opt:active{transform:scale(.98)}
+.opt .big{font-size:18px;font-weight:700;color:var(--ink);line-height:1.3}
+.opt .sub{font-size:12px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em}
+.opt .desc{font-size:13px;color:var(--ink-2);margin-top:6px}
+.opt .cnt{font-size:12px;font-weight:600;color:var(--violet);margin-top:8px}
+.opt .ico{font-size:26px;line-height:1;margin-bottom:8px}
+.opt.sel{background:linear-gradient(160deg,var(--blue-a),var(--blue-b));border-color:transparent;box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 14px 28px -12px rgba(37,99,235,.65)}
+.opt.sel .big,.opt.sel .desc,.opt.sel .cnt,.opt.sel .dist{color:#fff}
+.opt.sel .sub{color:#bfdbfe}
+.opt.sel::after{content:"\f00c";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;top:12px;right:12px;width:24px;height:24px;border-radius:50%;background:var(--yellow);color:var(--ink);display:grid;place-items:center;font-size:11px}
+.opt.near{background:linear-gradient(160deg,var(--yellow-a),var(--yellow));border-color:transparent;box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 14px 28px -12px rgba(202,138,4,.6)}
+.opt.near .sub,.opt.near .desc{color:#713f12}
+.opt.near .cnt{color:var(--ink)}
+.opt.near.sel{background:linear-gradient(160deg,var(--blue-a),var(--blue-b))}
+.opt:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+.row-label{font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:#fff;border:1px solid var(--cardline);border-radius:999px;padding:7px 14px;font-size:14px;font-weight:500;box-shadow:var(--depth-sm);color:var(--ink)}
+.chip.sel{background:var(--ink);border-color:var(--ink);color:#fff}
+.chip small{opacity:.6;font-size:11px;margin-left:4px}
+.chip.mine{border-color:#c4b5fd;color:var(--violet)}
+.chip.mine.sel{background:var(--violet);color:#fff}
+.chip.gpschip{background:linear-gradient(160deg,var(--blue-a),var(--blue-b));color:#fff;border-color:transparent;font-weight:600}
+
+.actions{display:flex;gap:10px;justify-content:space-between;align-items:center;padding-top:4px}
+.btn{border-radius:999px;padding:11px 20px;font-weight:600;font-size:14px;border:1px solid var(--cardline);background:#fff;color:var(--ink);box-shadow:var(--depth-sm)}
+.btn.primary{background:linear-gradient(160deg,var(--yellow-a),var(--yellow));border-color:transparent;color:var(--ink);box-shadow:0 1px 0 rgba(255,255,255,.6) inset,0 10px 22px -10px rgba(202,138,4,.7)}
+.btn.primary:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.btn.ghost{background:none;border-color:transparent;box-shadow:none;color:var(--violet);padding-inline:4px}
+.btn.more{align-self:center;width:100%;max-width:360px}
+.btn.more span{font-weight:400;color:var(--ink-3);font-size:13px}
+
+/* panels */
+.gps{display:flex;flex-wrap:wrap;gap:12px 14px;align-items:center;border-radius:24px;padding:18px;color:#fff;background:linear-gradient(160deg,var(--blue-a),var(--blue-b));box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 14px 28px -12px rgba(37,99,235,.65)}
+.gps-ico{width:44px;height:44px;border-radius:14px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-size:20px;flex:none}
+.gps>div{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 180px}
+.gps b{font-size:18px;font-weight:700}
+.gps span{font-size:13px;color:#dbeafe}
+.gps .btn.primary{flex:1 1 100%}
+.locbox,.settings{background:var(--card);border:1px solid var(--cardline);border-radius:24px;padding:16px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--depth)}
+.settings{border:2px solid var(--violet)}
+.loc-h{display:flex;flex-direction:column;gap:2px}
+.loc-h b{font-size:16px;font-weight:700;color:var(--ink)}
+.loc-h b i{color:var(--violet);margin-right:4px}
+.loc-h span{font-size:13px;color:var(--ink-2)}
+.locbox .chip{font-size:13px;padding:5px 12px}
+.locin,.savebar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.locin input,.savebar input,.settings input,.areabar input{flex:1 1 220px;min-width:0;font:inherit;font-size:14px;color:var(--ink);background:var(--inner);border:1px solid var(--cardline);border-radius:14px;padding:10px 14px}
+.locin .btn,.savebar .btn{padding:9px 16px}
+.err{margin:0;font-size:13px;color:var(--bad)}
+.hint{margin:0;font-size:12.5px;color:var(--ink-3)}
+.locnow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;font-size:14px;background:var(--inner);border:1px solid var(--cardline);border-radius:14px;padding:8px 12px;box-shadow:var(--depth-sm)}
+.mono{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.move{font-size:13.5px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.radius,.grp{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.radius>span,.grp>span{font-size:12px;color:var(--ink-3)}
+.tg{background:#fff;border:1px solid var(--cardline);border-radius:999px;padding:4px 12px;font-size:13px;font-weight:500;color:var(--ink-2)}
+.tg.sel{background:var(--blue);border-color:var(--blue);color:#fff}
+.areabar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.dist{font-size:12px;font-weight:600;color:var(--ink-3)}
+.dist.in{color:var(--blue)}
+.howto{margin:0;padding-left:20px;font-size:13.5px;color:var(--ink-2);display:flex;flex-direction:column;gap:4px}
+.howto a{color:var(--violet);font-weight:600}
+.howto code{font-family:var(--mono);font-size:12px;background:var(--inner);padding:0 4px;border-radius:4px;overflow-wrap:anywhere}
+
+/* results */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:12px 14px;background:var(--inner);border:1px solid var(--cardline);border-radius:20px;box-shadow:var(--depth-sm)}
+.list{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--card);border:1px solid var(--cardline);border-radius:24px;box-shadow:var(--depth);padding:16px;display:flex;flex-direction:column;gap:12px}
+.card.closed{opacity:.6}
+.card.sk{height:150px;background:linear-gradient(90deg,#fff 0%,var(--inner) 50%,#fff 100%);background-size:200% 100%;animation:shim 1.4s ease-in-out infinite}
+@keyframes shim{to{background-position:-200% 0}}
+.c-head{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start}
+.rank{font-size:12px;font-weight:700;color:var(--ink-3);min-width:30px;height:30px;border-radius:10px;background:var(--inner);display:grid;place-items:center}
+.rank.rk1{background:linear-gradient(160deg,var(--yellow-a),var(--yellow));color:var(--ink);box-shadow:0 6px 12px -6px rgba(202,138,4,.8)}
+.rank.inl{display:inline-grid;min-width:26px;height:22px;border-radius:7px;font-size:11px;margin-bottom:4px}
+.thumb{width:68px;height:68px;border-radius:16px;object-fit:cover;background:var(--inner);box-shadow:var(--depth-sm)}
+.c-name{font-weight:700;font-size:18px;line-height:1.3;margin:0;color:var(--ink)}
+.c-meta{font-size:13px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:3px;align-items:center}
+.score{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:62px;padding:8px 8px 6px;border-radius:16px;color:#fff;background:linear-gradient(160deg,var(--blue-a),var(--blue-b));box-shadow:0 10px 18px -10px rgba(37,99,235,.8)}
+.score .num{font-weight:700;font-size:22px;line-height:1;font-variant-numeric:tabular-nums}
+.score .stars{color:var(--yellow);font-size:9px;letter-spacing:1px;margin-top:3px}
+.score .rv{font-size:10.5px;color:#dbeafe;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;border-radius:999px;padding:1px 9px}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.p-ok{background:var(--ok-soft);color:var(--ok)}
+.p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-bad{background:var(--bad-soft);color:var(--bad)}
+.p-mute{background:var(--inner);color:var(--ink-3)}
+.dim{opacity:.3}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;background:var(--inner);border:1px solid var(--cardline);border-radius:18px;padding:12px 14px;box-shadow:var(--depth-sm)}
+.fact{display:flex;flex-direction:column;gap:1px;min-width:0}
+.fact .k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.fact .v{font-size:14px;color:var(--ink);overflow-wrap:anywhere}
+.fact .v.mono,.fact .mono{font-family:var(--mono);font-size:13px;color:var(--ink)}
+.fact .v.small{font-size:13px;color:var(--ink-2)}
+.v-note{font-family:var(--f);font-size:12.5px;color:var(--ink-3)}
+.tel{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.copy{font-size:11.5px;border:1px solid var(--cardline);background:#fff;border-radius:999px;padding:0 9px}
+details{font-size:12.5px;color:var(--ink-2)}
+details summary{cursor:pointer;color:var(--violet);font-size:12px;font-weight:600}
+.wk{margin:4px 0 0;padding-left:16px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;color:var(--violet);background:var(--violet-soft);border-radius:999px;padding:2px 10px}
+.c-foot{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.links a{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;text-decoration:none;color:var(--ink);background:#fff;border:1px solid var(--cardline);border-radius:999px;padding:6px 12px;box-shadow:var(--depth-sm)}
+.links a.go{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fav{background:#fff;border:1px solid var(--cardline);width:36px;height:36px;border-radius:50%;font-size:17px;line-height:1;color:var(--ink-3);flex:none}
+.fav.on{color:#e11d48;border-color:#fecdd3;background:#fff1f2}
+.credit{margin:-4px 0 0;font-size:11px;color:var(--ink-3)}
+.empty{background:var(--card);border:1px dashed #c4b5fd;border-radius:22px;padding:24px;text-align:center;color:var(--ink-2)}
+.loading{display:flex;align-items:center;gap:10px;color:var(--ink-2);font-size:14px}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid #ddd6fe;border-top-color:var(--blue);animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.maps{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--cardline);border-radius:20px;padding:13px 16px;color:var(--ink);text-decoration:none;font-size:14px;box-shadow:var(--depth-sm)}
+.maps i{color:var(--blue)}
+.maps b{color:var(--violet)}
+.note{font-size:12.5px;color:var(--ink-3);border-left:3px solid #c4b5fd;padding-left:10px;margin:0}
+
+@media (max-width:480px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .opt{padding:14px 13px 12px;border-radius:20px}
+  .opt .big{font-size:16.5px}
+  .facts{grid-template-columns:1fr}
+  .st .lb{font-size:9.5px}
+  .c-head{gap:10px}
+  .thumb{width:56px;height:56px;border-radius:14px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<header class="top"><div class="topin"><div class="logo">กินไหน<b>ดี</b></div><div class="live">LIVE · GOOGLE PLACES</div></div></header>
-<main id="app"></main>
+<div class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="logo"><span class="logo-ico"><i class="fa-solid fa-utensils"></i></span>
+        <div><h1>กินไหน<span>ดี</span></h1><div class="sample" id="modeLbl"></div></div></div>
+      <div class="brand-r"><button class="setbtn" id="setBtn" aria-label="ตั้งค่า"><i class="fa-solid fa-gear"></i></button></div>
+    </div>
+    <div class="steps" id="steps"></div>
+    <div class="crumbs" id="crumbs"></div>
+  </div>
+</div>
+<main class="wrap"><div class="stage" id="stage"></div></main>
 <script>
-const COUNTRIES={
- jp:{th:"ญี่ปุ่น",en:"Japan",cities:{tokyo:{th:"โตเกียว",en:"Tokyo",areas:["Shinjuku","Shibuya","Ginza","Asakusa","Ueno","Ikebukuro"]},osaka:{th:"โอซาก้า",en:"Osaka",areas:["Namba","Dotonbori","Umeda","Shinsekai","Tenma"]}}},
- th:{th:"ไทย",en:"Thailand",cities:{bkk:{th:"กรุงเทพฯ",en:"Bangkok",areas:["Siam","Charoen Krung","Banglamphu","Chatuchak","Ratchada"]},cnx:{th:"เชียงใหม่",en:"Chiang Mai",areas:["Old City","Nimman","Night Bazaar","Santitham"]}}},
- kr:{th:"เกาหลีใต้",en:"South Korea",cities:{seoul:{th:"โซล",en:"Seoul",areas:["Gangnam","Seongsu","Itaewon","Insadong","Gwangjang Market"]}}}
+/* ---------- master data (ตัวอย่าง) ---------- */
+const COUNTRIES = {
+  jp:{name:"ญี่ปุ่น",en:"Japan",tz:"Asia/Tokyo",cur:"¥",cities:{
+    tokyo:{name:"โตเกียว",en:"Tokyo",areas:{
+      shinjuku:["ชินจูกุ","Shinjuku","ราเมง อิซากายะ ชีวิตกลางคืน"],
+      shibuya:["ชิบูย่า","Shibuya","ยากินิคุ ร้านเปิดดึก คาเฟ่"],
+      harajuku:["ฮาราจุกุ / โอโมเตะซันโด","Harajuku","ของหวานเทรนด์ใหม่ กิวคัตสึ"],
+      ebisu:["เอบิสุ / ไดคังยามะ","Ebisu","ร้านเก๋ ตรอกโยโกโจ ของหวาน"],
+      nakameguro:["นากาเมกุโระ","Nakameguro","ริมคลองเมกุโระ คาเฟ่ ยากิโทริ"],
+      shimokita:["ชิโมคิตะซาวะ","Shimokitazawa","ร้านวินเทจ ซุปแกงกะหรี่"],
+      roppongi:["รปปงงิ / อาซาบุ","Roppongi","ร้านหรู เทปปันยากิ โซบะ"],
+      ginza:["กินซ่า / สึกิจิ","Ginza","ไฟน์ไดนิ่ง ซูชิตลาดสึกิจิ"],
+      marunouchi:["โตเกียวสเตชั่น / มารุโนะอุจิ","Tokyo Station","ถนนราเมงใต้สถานี ปลาไหล"],
+      akihabara:["อากิฮาบาระ / คันดะ","Akihabara","แกงกะหรี่ ร้านเร็ว ราคาถูก"],
+      ueno:["อุเอโนะ / อาเมโยโกะ","Ueno","ตลาดอาเมโยโกะ ข้าวหน้าซีฟู้ด"],
+      asakusa:["อาซากุสะ","Asakusa","เทมปุระ ของกินรอบวัดเซ็นโซจิ"],
+      ikebukuro:["อิเคะบุคุโระ","Ikebukuro","ราเมงเปิดดึก ยากินิคุบุฟเฟต์"]}},
+    osaka:{name:"โอซาก้า",en:"Osaka",areas:{
+      namba:["นัมบะ / โดทงโบริ","Namba","ทาโกะยากิ โอโคโนมิยากิ"],
+      shinsaibashi:["ชินไซบาชิ / อเมมูระ","Shinsaibashi","ช้อปปิ้ง ชีสเค้ก ราเมงดึก"],
+      kuromon:["ตลาดคุโรมง","Kuromon Market","ซีฟู้ดสด หอยเม่น ปลาปักเป้า"],
+      shinsekai:["ชินเซไก","Shinsekai","คุชิคัตสึต้นตำรับ ใต้หอสึเทนคาคุ"],
+      umeda:["อุเมดะ / คิตะชินจิ","Umeda","วากิว ร้านหรู คาเฟ่ในห้าง"],
+      tenma:["เท็นมะ","Tenma","ถนนร้านนั่งดื่มยาวที่สุดในญี่ปุ่น"]}}}},
+  th:{name:"ไทย",en:"Thailand",tz:"Asia/Bangkok",cur:"฿",cities:{
+    bkk:{name:"กรุงเทพฯ",en:"Bangkok",areas:{
+      sukhumvit:["สุขุมวิท / ทองหล่อ","Sukhumvit","โอมากาเสะ คาเฟ่ ร้านไทยร่วมสมัย"],
+      siam:["สยาม / ประตูน้ำ","Siam","ห้างใหญ่ ข้าวมันไก่ บิงซู"],
+      silom:["สีลม / สาทร","Silom","ร้านข้าวออฟฟิศ ซีฟู้ดริมน้ำ"],
+      charoenkrung:["เจริญกรุง / ตลาดน้อย","Charoen Krung","ย่านสร้างสรรค์ริมเจ้าพระยา"],
+      yaowarat:["เยาวราช","Yaowarat","สตรีทฟู้ดกลางคืน อาหารจีน"],
+      banglamphu:["บางลำพู / ข้าวสาร","Banglamphu","ผัดไทย ต้มยำ ร้านดั้งเดิม"],
+      ari:["อารีย์","Ari","ก๋วยเตี๋ยว บรันช์ หมูกระทะ"],
+      chatuchak:["จตุจักร / ลาดพร้าว","Chatuchak","ตลาดนัดเสาร์–อาทิตย์"],
+      ratchada:["รัชดา / ห้วยขวาง","Ratchada","ร้านดึก เล้งแซ่บ โจ๊ก"]}},
+    cnx:{name:"เชียงใหม่",en:"Chiang Mai",areas:{
+      nimman:["นิมมาน","Nimman","ข้าวซอย คาเฟ่ รูฟท็อป"],
+      oldcity:["คูเมือง","Old City","ขันโตก ก๋วยเตี๋ยวกลางคืน"],
+      nightbazaar:["ไนท์บาซาร์ / ช้างคลาน","Night Bazaar","อาหารเหนือ ริมแม่น้ำปิง"],
+      santitham:["สันติธรรม / ช้างเผือก","Santitham","ร้านท้องถิ่น ราคาคนเชียงใหม่"]}}}},
+  kr:{name:"เกาหลีใต้",en:"South Korea",tz:"Asia/Seoul",cur:"₩",cities:{
+    seoul:{name:"โซล",en:"Seoul",areas:{
+      myeongdong:["เมียงดง","Myeongdong","คัลกุกซู ของกินข้างทาง"],
+      hongdae:["ฮงแด / ยอนนัม","Hongdae","ทัคคาลบี บิงซู ร้านดึก"],
+      gangnam:["คังนัม / ซินซา","Gangnam","ฮันอูโอมากาเสะ คาเฟ่การอซูกิล"],
+      seongsu:["ซองซู","Seongsu","โกดังเก่ากลายเป็นคาเฟ่"],
+      itaewon:["อิแทวอน","Itaewon","บาร์บีคิว รูฟท็อป นานาชาติ"],
+      insadong:["อินซาดง / จงโน","Insadong","บ้านโบราณ ซัมกเยทัง ร้านชา"],
+      gwangjang:["ตลาดควังจัง","Gwangjang Market","บินแดต๊อก ยุกฮเว คิมบับ"]}}}}
 };
-const CUISINES=["อาหารท้องถิ่น","ซูชิ","ราเมง","ปิ้งย่าง / BBQ","อาหารทะเล","Street Food","คาเฟ่","ของหวาน","Fine Dining","อิซากายะ"];
-let S={step:0,country:null,city:null,area:null,cuisines:[]};
-const app=document.querySelector("#app"), esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function head(n,t,s){return `<section class="hero"><span class="step">ขั้นที่ ${n} / 4</span><h1>${t}</h1><p>${s||""}</p></section>`}
-function back(){return `<button class="btn" onclick="S.step--;render()">← ย้อนกลับ</button>`}
+const CUISINES = {
+  ramen:["🍜","ราเมง / เส้น"], sushi:["🍣","ซูชิ / โอมากาเสะ"], grill:["🥩","ปิ้งย่าง / ยากินิคุ"],
+  izakaya:["🏮","ร้านนั่งดื่ม / อิซากายะ"], fried:["🍤","เทมปุระ / ทงคัตสึ"], okonomi:["🥞","โอโคโนมิยากิ"],
+  donburi:["🍚","ข้าวหน้า / ดงบุริ"], yoshoku:["🍛","แกงกะหรี่ / โยโชคุ"], fine:["🍽️","ไฟน์ไดนิ่ง"], thai:["🌶️","อาหารไทย"], korean:["🥘","อาหารเกาหลี"], seafood:["🦀","ซีฟู้ด"],
+  street:["🥢","สตรีทฟู้ด"], cafe:["☕","คาเฟ่ / บรันช์"], dessert:["🍧","ของหวาน"]
+};
+const MEALS = [
+  {k:"now",lb:"ตอนนี้",sub:"เวลาท้องถิ่น"},
+  {k:"breakfast",lb:"มื้อเช้า",sub:"08:00",t:"08:00"},
+  {k:"lunch",lb:"มื้อกลางวัน",sub:"12:00",t:"12:00"},
+  {k:"afternoon",lb:"บ่าย / ของว่าง",sub:"15:00",t:"15:00"},
+  {k:"dinner",lb:"มื้อเย็น",sub:"19:00",t:"19:00"},
+  {k:"late",lb:"ดึก",sub:"23:00",t:"23:00"},
+  {k:"any",lb:"ไม่ระบุเวลา",sub:"แสดงทุกร้าน"}
+];
+// พิกัดกลางย่าน (โดยประมาณ)
+const GEO = {
+  shinjuku:[35.6909,139.7003],shibuya:[35.6595,139.7005],harajuku:[35.6702,139.7027],ebisu:[35.6467,139.7101],nakameguro:[35.6441,139.6988],
+  shimokita:[35.6613,139.6680],roppongi:[35.6628,139.7314],ginza:[35.6717,139.7650],marunouchi:[35.6812,139.7671],akihabara:[35.6984,139.7731],
+  ueno:[35.7101,139.7745],asakusa:[35.7118,139.7966],ikebukuro:[35.7295,139.7109],
+  namba:[34.6687,135.5013],shinsaibashi:[34.6724,135.4984],kuromon:[34.6652,135.5068],shinsekai:[34.6525,135.5063],umeda:[34.7025,135.4959],tenma:[34.7045,135.5118],
+  sukhumvit:[13.7246,100.5786],siam:[13.7456,100.5347],silom:[13.7286,100.5340],charoenkrung:[13.7300,100.5140],yaowarat:[13.7398,100.5098],
+  banglamphu:[13.7590,100.4977],ari:[13.7797,100.5446],chatuchak:[13.7999,100.5503],ratchada:[13.7667,100.5697],
+  nimman:[18.7990,98.9676],oldcity:[18.7883,98.9853],nightbazaar:[18.7851,99.0000],santitham:[18.8000,98.9810],
+  myeongdong:[37.5636,126.9860],hongdae:[37.5563,126.9236],gangnam:[37.5163,127.0203],seongsu:[37.5446,127.0559],
+  itaewon:[37.5345,126.9946],insadong:[37.5740,126.9850],gwangjang:[37.5700,126.9996]
+};
+// จุดอ้างอิงที่เลือกเป็นตำแหน่งได้
+const LANDMARKS = {
+  tokyo:[["สถานีชินจูกุ",35.6896,139.7006],["สถานีโตเกียว",35.6812,139.7671],["แยกชิบูย่า",35.6595,139.7005],["วัดเซ็นโซจิ",35.7148,139.7967],["โตเกียวสกายทรี",35.7101,139.8107],["ศาลเจ้าเมจิ",35.6764,139.6993],["teamLab Planets",35.6491,139.7898]],
+  osaka:[["สถานีนัมบะ",34.6664,135.5003],["สถานีโอซาก้า/อุเมดะ",34.7025,135.4959],["ปราสาทโอซาก้า",34.6873,135.5262],["Universal Studios Japan",34.6654,135.4323]],
+  bkk:[["BTS สยาม",13.7456,100.5341],["BTS อโศก",13.7370,100.5603],["ไอคอนสยาม",13.7267,100.5104],["พระบรมมหาราชวัง",13.7500,100.4913],["สวนจตุจักร",13.8030,100.5530]],
+  cnx:[["ประตูท่าแพ",18.7877,98.9933],["เมญ่า นิมมาน",18.8024,98.9672],["สนามบินเชียงใหม่",18.7668,98.9626]],
+  seoul:[["สถานีโซล",37.5547,126.9707],["พระราชวังคย็องบก",37.5796,126.9770],["N Seoul Tower",37.5512,126.9882],["COEX คังนัม",37.5119,127.0590]]
+};
+function km(a,b){ const R=6371,rad=x=>x*Math.PI/180; const dLa=rad(b[0]-a[0]),dLo=rad(b[1]-a[1]);
+  const h=Math.sin(dLa/2)**2+Math.cos(rad(a[0]))*Math.cos(rad(b[0]))*Math.sin(dLo/2)**2; return 2*R*Math.asin(Math.sqrt(h)); }
+function distTxt(d){ if(d<1) return `${Math.round(d*1000)} ม. · เดิน ${Math.max(1,Math.round(d*1000/80))} นาที`;
+  if(d<=2.5) return `${d.toFixed(1)} กม. · เดิน ${Math.round(d*1000/80)} นาที`; return `${d.toFixed(1)} กม. · รถไฟ/แท็กซี่ ~${Math.round(8+d*3)} นาที`; }
+function parseLoc(s){
+  s = s.trim(); if(!s) return {err:"ยังไม่ได้วางลิงก์หรือพิกัด"};
+  if(/goo\.gl|maps\.app/.test(s)) return {err:"ลิงก์ย่อ (maps.app.goo.gl) อ่านพิกัดไม่ได้ ให้เปิดใน Google Maps แล้วกดค้างที่จุดเพื่อคัดลอกพิกัด เช่น 35.6812, 139.7671"};
+  let m = s.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/) || s.match(/@(-?\d+\.\d+),\s*(-?\d+\.\d+)/) || s.match(/(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/);
+  if(!m) return {err:"อ่านพิกัดไม่ได้ ลองวางแบบ 35.6953, 139.7010 หรือลิงก์ Google Maps แบบเต็ม"};
+  const lat=+m[1], lng=+m[2];
+  if(Math.abs(lat)>90||Math.abs(lng)>180) return {err:"พิกัดไม่ถูกต้อง"};
+  return {lat,lng};
+}
+function nearestCity(p){
+  let best=null;
+  for(const [co,c] of Object.entries(COUNTRIES)) for(const [ci,cc] of Object.entries(c.cities)) for(const a of Object.keys(cc.areas)){
+    const d=km(p,GEO[a]); if(!best||d<best.d) best={co,ci,d};
+  }
+  return best;
+}
+const DAYS = ["อา.","จ.","อ.","พ.","พฤ.","ศ.","ส."];
+const DAYS_FULL = ["วันอาทิตย์","วันจันทร์","วันอังคาร","วันพุธ","วันพฤหัสฯ","วันศุกร์","วันเสาร์"];
+
+
+
+/* ---------- ตั้งค่า Google ---------- */
+// ใส่ API key ตรงนี้ก่อน deploy ขึ้น Firebase ได้ หรือใส่ผ่านปุ่ม "ตั้งค่า" ในแอป (เก็บไว้ในเครื่องนั้น)
+const API_KEY_IN_FILE = "";
+function getKey(){ if(API_KEY_IN_FILE) return API_KEY_IN_FILE; try{ return localStorage.getItem("kd-key")||""; }catch(e){ return ""; } }
+const REAL = () => !!getKey();
+const CUISINE_Q = {ramen:"ramen noodles",sushi:"sushi",grill:"yakiniku bbq grill",izakaya:"izakaya",fried:"tempura tonkatsu",okonomi:"okonomiyaki",
+  donburi:"donburi rice bowl",yoshoku:"japanese curry omurice",fine:"fine dining",thai:"thai restaurant",korean:"korean restaurant",
+  seafood:"seafood restaurant",street:"street food",cafe:"cafe",dessert:"dessert",_all:"restaurant"};
+const PRICE = {FREE:0,INEXPENSIVE:1,MODERATE:2,EXPENSIVE:3,VERY_EXPENSIVE:4,PRICE_LEVEL_INEXPENSIVE:1,PRICE_LEVEL_MODERATE:2,PRICE_LEVEL_EXPENSIVE:3,PRICE_LEVEL_VERY_EXPENSIVE:4};
+const FIELDS = ["id","displayName","location","rating","userRatingCount","priceLevel","regularOpeningHours","utcOffsetMinutes",
+  "internationalPhoneNumber","nationalPhoneNumber","reservable","googleMapsURI","formattedAddress","websiteURI","photos","primaryTypeDisplayName","businessStatus"];
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const toMin = s => { const [h,m] = s.split(":").map(Number); return h*60+m; };
+const cityOf = (co,ci) => COUNTRIES[co].cities[ci];
+function hhmm(m){ m=((m%1440)+1440)%1440; return String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0"); }
+function localNow(tz){
+  const parts = new Intl.DateTimeFormat("en-US",{timeZone:tz,weekday:"short",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(new Date());
+  const get = t => parts.find(p=>p.type===t).value;
+  let h = +get("hour"); if(h===24) h=0;
+  return {day:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].indexOf(get("weekday")),min:h*60+ +get("minute")};
+}
+function deviceNow(){ const d=new Date(); return {day:d.getDay(),min:d.getHours()*60+d.getMinutes()}; }
+function offsetNow(off){ const d=new Date(Date.now()+off*60000); return {day:d.getUTCDay(),min:d.getUTCHours()*60+d.getUTCMinutes()}; }
+function placeNow(){ return S.country ? localNow(COUNTRIES[S.country].tz) : deviceNow(); }
+// ข้อมูลตัวอย่าง
+
+
+function openReal(x,day,min){
+  if(!x.periods||!x.periods.length) return {open:null};
+  const t=day*1440+min, W=10080;
+  for(const p of x.periods){
+    if(!p.close) return {open:true,left:null};
+    const s=p.open.day*1440+p.open.hour*60+p.open.minute;
+    let e=p.close.day*1440+p.close.hour*60+p.close.minute; if(e<=s) e+=W;
+    for(const tt of [t,t+W]) if(tt>=s&&tt<e) return {open:true,left:e-tt};
+  }
+  return {open:false};
+}
+
+/* ---------- state ---------- */
+const S = {step:0,country:null,city:null,area:null,cuisines:[],day:null,meal:null,sort:"smart",minR:0,resOnly:false,openOnly:false,
+  loc:null,radius:2,locErr:"",locMove:null,areaSort:null,show:10,real:null,realLoading:null,settings:false,gpsBusy:false};
+let favs=new Set(), myAreas=[];
+try{ favs=new Set(JSON.parse(localStorage.getItem("kd-favs")||"[]")); }catch(e){}
+try{ myAreas=JSON.parse(localStorage.getItem("kd-areas")||"[]"); }catch(e){}
+const saveFavs=()=>{ try{ localStorage.setItem("kd-favs",JSON.stringify([...favs])); }catch(e){} };
+const saveAreas=()=>{ try{ localStorage.setItem("kd-areas",JSON.stringify(myAreas)); }catch(e){} };
+const NEAR="__near";
+const locPt=()=>[S.loc.lat,S.loc.lng];
+function areaDist(a){ return S.loc ? km(locPt(),GEO[a]) : null; }
+function nearAreas(){ return S.city ? Object.keys(cityOf(S.country,S.city).areas).filter(a=>areaDist(a)<=S.radius) : []; }
+function curArea(){
+  if(S.area===NEAR) return {th:`รอบ ${S.loc.label} · ${S.radius} กม.`,en:"",near:true};
+  const a=cityOf(S.country,S.city).areas[S.area]; return {th:a[0],en:a[1],near:false};
+}
+function placeName(){ return S.city ? cityOf(S.country,S.city).name : "ตำแหน่งนี้"; }
+function cuisineText(){
+  if(S.cuisines.includes("_all")) return "ร้านอาหารทุกประเภท";
+  return S.cuisines.map(k=>CUISINES[k][1].split(" / ")[0]).join(", ");
+}
+
+
+/* ---------- Google Places ---------- */
+let gmPromise=null;
+function loadGoogle(){
+  if(gmPromise) return gmPromise;
+  gmPromise=new Promise((res,rej)=>{
+    window.__kdReady=()=>res();
+    window.gm_authFailure=()=>{ S.real={key:S.realLoading||"x",err:"Google ปฏิเสธ API key นี้ ตรวจว่าเปิด Maps JavaScript API กับ Places API (New) แล้ว และตั้งข้อจำกัดเว็บไซต์ (referrer) ให้ตรงกับโดเมนที่เปิดแอป"}; S.realLoading=null; if(S.step===5) render(); };
+    const sc=document.createElement("script");
+    sc.src=`https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(getKey())}&v=weekly&loading=async&language=th&callback=__kdReady`;
+    sc.async=true;
+    sc.onerror=()=>{ gmPromise=null; rej(new Error("โหลด Google Maps ไม่ได้ ตรวจอินเทอร์เน็ตแล้วลองใหม่")); };
+    document.head.appendChild(sc);
+  });
+  return gmPromise;
+}
+const cache=new Map();
+async function fetchReal(center,radiusM,cuis){
+  const ck=JSON.stringify([center.lat.toFixed(4),center.lng.toFixed(4),radiusM,[...cuis].sort()]);
+  if(cache.has(ck)) return cache.get(ck);
+  await loadGoogle();
+  const {Place}=await google.maps.importLibrary("places");
+  const qs=cuis.length?cuis:["_all"];
+  const res=await Promise.all(qs.map(k=>Place.searchByText({
+    textQuery:"best "+CUISINE_Q[k], fields:FIELDS, rankPreference:"RELEVANCE", locationBias:{center,radius:Math.min(radiusM,50000)}, maxResultCount:20, language:"th"
+  }).then(r=>({k,places:r.places||[]}))));
+  const map=new Map();
+  for(const {k,places} of res) for(const p of places){
+    if(p.businessStatus && String(p.businessStatus)!=="OPERATIONAL") continue;
+    if(!p.location) continue;
+    const lat=p.location.lat(), lng=p.location.lng();
+    const d=km([center.lat,center.lng],[lat,lng]);
+    if(d*1000>radiusM*1.25) continue;
+    if(map.has(p.id)){ const e=map.get(p.id); if(k!=="_all"&&!e.k.includes(k)) e.k.push(k); continue; }
+    const ph=p.photos&&p.photos[0];
+    let photo=""; try{ photo=ph?ph.getURI({maxWidth:240,maxHeight:240}):""; }catch(e){}
+    map.set(p.id,{real:true,id:p.id,n:p.displayName||"",k:k==="_all"?[]:[k],type:p.primaryTypeDisplayName||"",r:p.rating||0,v:p.userRatingCount||0,
+      p:PRICE[String(p.priceLevel||"").toUpperCase()]||0,periods:p.regularOpeningHours?p.regularOpeningHours.periods:null,
+      wd:p.regularOpeningHours?p.regularOpeningHours.weekdayDescriptions:null,off:p.utcOffsetMinutes,
+      t:p.internationalPhoneNumber||p.nationalPhoneNumber||"",resv:p.reservable,maps:p.googleMapsURI||"",addr:p.formattedAddress||"",
+      web:p.websiteURI||"",photo,photoBy:ph&&ph.authorAttributions&&ph.authorAttributions[0]?ph.authorAttributions[0].displayName:"",lat,lng});
+  }
+  const out={list:[...map.values()],calls:qs.length};
+  cache.set(ck,out); return out;
+}
+function realQuery(){
+  const c=S.area===NEAR?{lat:S.loc.lat,lng:S.loc.lng}:{lat:GEO[S.area][0],lng:GEO[S.area][1]};
+  const rm=S.area===NEAR?S.radius*1000:1200;
+  return {c,rm,cu:[...S.cuisines]};
+}
+function ensureReal(){
+  const q=realQuery();
+  const key=JSON.stringify([q.c.lat.toFixed(4),q.c.lng.toFixed(4),q.rm,[...q.cu].sort()]);
+  if(S.real&&S.real.key===key) return S.real;
+  if(S.realLoading===key) return null;
+  S.realLoading=key; S.show=10;
+  fetchReal(q.c,q.rm,q.cu)
+    .then(out=>{ if(S.realLoading===key) S.real={key,...out,center:q.c,rm:q.rm}; })
+    .catch(e=>{ if(S.realLoading===key) S.real={key,err:"ค้นหาไม่สำเร็จ: "+(e&&e.message?e.message:e)}; })
+    .finally(()=>{ if(S.realLoading===key){ S.realLoading=null; if(S.step===5) render(); } });
+  return null;
+}
+
+/* ---------- ตำแหน่ง ---------- */
+function useGPS(){
+  if(!navigator.geolocation){ S.locErr="อุปกรณ์หรือเบราว์เซอร์นี้ไม่รองรับ GPS ให้วางพิกัดแทน"; render(); return; }
+  S.gpsBusy=true; S.locErr=""; render();
+  navigator.geolocation.getCurrentPosition(pos=>{
+    S.gpsBusy=false; applyPoint(pos.coords.latitude,pos.coords.longitude,"ตำแหน่งปัจจุบัน");
+  },err=>{
+    S.gpsBusy=false;
+    S.locErr = err.code===1 ? "ยังไม่ได้อนุญาตให้ใช้ตำแหน่ง เปิดสิทธิ์ Location ของเบราว์เซอร์แล้วกดใหม่"
+      : "หาตำแหน่งไม่ได้ ลองอีกครั้ง หรือวางพิกัดจาก Google Maps แทน";
+    render();
+  },{enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+}
+function applyPoint(lat,lng,label){
+  const nc=nearestCity([lat,lng]);
+  if(nc&&nc.d<40){ if(S.city!==nc.ci){ S.country=nc.co; S.city=nc.ci; S.day=null; } }
+  else {
+    S.country=null; S.city=null; S.day=null;
+  }
+  S.loc={lat,lng,label}; S.locErr=""; S.locMove=null; S.areaSort=null;
+  S.area=NEAR; S.cuisines=[]; go(3);
+}
+function setLoc(lat,lng,label,extra={}){
+  S.loc={lat,lng,label,...extra}; S.locErr=""; S.areaSort=null;
+  const nc=nearestCity([lat,lng]);
+  S.locMove=(nc&&nc.ci!==S.city&&nc.d<40)?{co:nc.co,ci:nc.ci}:null;
+  if(nc&&nc.d>=40) S.locErr = "ตำแหน่งนี้ไม่อยู่ในเมืองที่มีในรายการ เลือกการ์ด “รอบ…” เพื่อค้นหาร้านรอบจุดนี้ได้เลย";
+  if(S.area===NEAR) S.cuisines=[];
+}
+
+/* ---------- chrome ---------- */
+const STEP_LABELS=["ประเทศ","เมือง","ย่าน","ประเภท","เวลา","ผลลัพธ์"];
+function renderChrome(){
+  const reach=[true,!!S.country,!!S.city,!!S.area,S.cuisines.length>0,S.meal!==null];
+  $("#steps").innerHTML=STEP_LABELS.map((l,i)=>{
+    const cls=i===S.step?"cur":(i<S.step?"done":"");
+    const can=(i<=S.step||reach.slice(0,i+1).every(Boolean)) && !(i===1&&!S.country) && !(i===2&&!S.city);
+    return `<button class="st ${cls}" data-go="${i}" ${can?"":"disabled"} aria-label="ขั้นที่ ${i+1} ${l}"><span class="bar"></span><span class="lb">${i+1} ${l}</span></button>`;
+  }).join("");
+  $("#modeLbl").innerHTML = REAL() ? `<span class="live">LIVE · GOOGLE PLACES</span>` : `ยังไม่ได้ใส่ API KEY`;
+}
+function mealText(){
+  if(S.meal==="any") return "ไม่ระบุเวลา";
+  if(S.meal==="now") return "เปิดตอนนี้";
+  return `${DAYS_FULL[S.day]} ${MEALS.find(m=>m.k===S.meal).t}`;
+}
+function go(i){
+  if(i===1&&!S.country) i=0;
+  if(i===2&&!S.city) i=S.country?1:0;
+  S.step=i; render(); window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* ---------- settings ---------- */
+function settingsPanel(){
+  const inFile=!!API_KEY_IN_FILE, k=getKey();
+  return `<section class="settings">
+    <div class="loc-h"><b><i class="fa-solid fa-gear"></i> ตั้งค่าข้อมูลร้าน</b><span>${REAL()?"ตอนนี้ดึงร้านจริงจาก Google Places":"ยังไม่ได้ใส่ API key แอปจะค้นหาร้านไม่ได้จนกว่าจะใส่"}</span></div>
+    ${inFile?`<p class="hint">API key ฝังอยู่ในไฟล์แล้ว (API_KEY_IN_FILE) แก้ได้ที่ต้นไฟล์ HTML</p>`:
+    `<div class="locin"><input id="apikey" type="password" autocomplete="off" placeholder="วาง Google API key (ขึ้นต้นด้วย AIza…)" aria-label="Google API key" value="${esc(k)}">
+      <button class="btn primary" data-savekey="1">บันทึกและโหลดใหม่</button>${k?`<button class="btn" data-delkey="1">ลบ key</button>`:""}</div>
+    <p class="hint">key เก็บไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น</p>`}
+    <ol class="howto">
+      <li>เปิด <a href="https://console.cloud.google.com/google/maps-apis/api-list" target="_blank" rel="noopener">Google Cloud Console ↗</a> เลือกหรือสร้างโปรเจกต์ แล้วเปิดใช้ <b>Maps JavaScript API</b> และ <b>Places API (New)</b></li>
+      <li>ไปที่ <a href="https://console.cloud.google.com/google/maps-apis/credentials" target="_blank" rel="noopener">Keys &amp; Credentials ↗</a> กด Create API key</li>
+      <li>ตั้ง Application restriction เป็น <b>Websites</b> ใส่โดเมนของแอป เช่น <code>https://nickiebkk-byte.github.io/*</code></li>
+      <li>ตั้ง API restriction ให้ใช้ได้แค่ 2 API ข้างบน และตั้ง Budget alert ในหน้า Billing</li>
+    </ol>
+    <p class="hint">การค้นหาแต่ละครั้งใช้ 1 คำขอต่อประเภทอาหารที่เลือก ผลเดิมจะถูกจำไว้ ไม่เรียกซ้ำเมื่อสลับตัวกรอง</p>
+  </section>`;
+}
+
+/* ---------- steps ---------- */
+function crumbList(){
+  const cr=[];
+  if(S.country) cr.push(COUNTRIES[S.country].name);
+  if(S.city) cr.push(cityOf(S.country,S.city).name);
+  if(S.area) cr.push(curArea().th);
+  if(S.cuisines.length) cr.push(cuisineText());
+  if(S.meal) cr.push(mealText());
+  return cr;
+}
+function hero(kick,title,sub,icon){
+  const cr=crumbList();
+  return `<section class="hero"><i class="fa-solid ${icon||"fa-bowl-food"} hero-ico" aria-hidden="true"></i>
+    <div class="kick"><i class="fa-solid fa-star"></i> ${kick}</div><h2>${title}</h2>${sub?`<p>${sub}</p>`:""}
+    ${cr.length?`<div class="pills">${cr.map((c,i)=>`<span class="${i===cr.length-1?"hl":""}">${esc(c)}</span>`).join("")}</div>`:""}</section>`;
+}
+const STEP_ICONS=["fa-earth-asia","fa-city","fa-map-location-dot","fa-bowl-food","fa-clock","fa-trophy"];
+function head(no,title,sub){ return hero(`ขั้นที่ ${no} / 5`,title,sub,STEP_ICONS[no-1]); }
+function back(){ return S.step>0?`<button class="btn ghost" data-go="${S.step-1}">← ย้อนกลับ</button>`:"<span></span>"; }
+function gpsCard(){
+  return `<div class="gps"><span class="gps-ico"><i class="fa-solid fa-location-crosshairs"></i></span><div><b>หาร้านรอบตัวฉันตอนนี้</b><span>ใช้ GPS ของมือถือ ค้นหาร้านจริงจาก Google ได้ทุกเมือง</span></div>
+    <button class="btn primary" data-gps="1" ${S.gpsBusy?"disabled":""}>${S.gpsBusy?"กำลังหาตำแหน่ง…":`<i class="fa-solid fa-location-arrow"></i> ใช้ตำแหน่งปัจจุบัน`}</button></div>
+    ${S.locErr&&S.step===0?`<p class="err">${esc(S.locErr)}</p>`:""}`;
+}
+function stepCountry(){
+  return head(1,"อยากไปกินที่ไหนดี","ใช้ตำแหน่งปัจจุบัน หรือเลือกประเทศ เมือง และย่านเอง") + gpsCard() + `<div class="row-label">หรือเลือกประเทศ</div>` +
+  `<div class="grid">${Object.entries(COUNTRIES).map(([k,c])=>{
+    return `<button class="opt ${S.country===k?"sel":""}" data-country="${k}"><span class="big">${c.name}</span><span class="sub">${c.en} · ${Object.keys(c.cities).length} เมือง</span><span class="cnt">${Object.values(c.cities).reduce((s,ci)=>s+Object.keys(ci.areas).length,0)} ย่าน</span></button>`;
+  }).join("")}</div>`;
+}
+function stepCity(){
+  const co=COUNTRIES[S.country];
+  return head(2,`เมืองไหนใน${co.name}`,"") +
+  `<div class="grid">${Object.entries(co.cities).map(([k,c])=>{
+    return `<button class="opt ${S.city===k?"sel":""}" data-city="${k}"><span class="big">${c.name}</span><span class="sub">${c.en} · ${Object.keys(c.areas).length} ย่าน</span></button>`;
+  }).join("")}</div><div class="actions">${back()}</div>`;
+}
+function locPanel(){
+  const lms=LANDMARKS[S.city]||[], mine=myAreas.filter(m=>m.city===S.city), L=S.loc;
+  const savedAlready=L&&myAreas.some(m=>m.city===S.city&&Math.abs(m.lat-L.lat)<1e-4&&Math.abs(m.lng-L.lng)<1e-4);
+  let body=`<div class="loc-h"><b><i class="fa-solid fa-map-pin"></i> หาย่านจากตำแหน่ง</b><span>ใช้ GPS เลือกจุดอ้างอิง หรือวางพิกัด/ลิงก์ Google Maps แล้วแอปจะเรียงย่านจากใกล้ไปไกล</span></div>
+    <div class="chips"><button class="chip gpschip" data-gps="1" ${S.gpsBusy?"disabled":""}>${S.gpsBusy?"กำลังหาตำแหน่ง…":`<i class="fa-solid fa-location-crosshairs"></i> ใช้ GPS`}</button>${mine.map(m=>`<button class="chip mine ${L&&L.myId===m.id?"sel":""}" data-my="${m.id}">★ ${esc(m.name)}</button>`).join("")}${lms.map((l,i)=>`<button class="chip ${L&&L.lm===i?"sel":""}" data-lm="${i}">${esc(l[0])}</button>`).join("")}</div>
+    <div class="locin"><input id="locq" type="text" autocomplete="off" placeholder="วางพิกัด เช่น 35.6953, 139.7010 หรือลิงก์ Google Maps" aria-label="พิกัดหรือลิงก์ Google Maps"><button class="btn" data-locgo="1">ใช้ตำแหน่งนี้</button></div>
+    ${S.locErr?`<p class="err">${esc(S.locErr)}</p>`:`<p class="hint">วิธีเอาพิกัด: ใน Google Maps กดค้างตรงจุดที่ต้องการ แล้วแตะตัวเลขพิกัดด้านบนเพื่อคัดลอก</p>`}`;
+  if(L){
+    body+=`<div class="locnow"><span>ตำแหน่งที่ใช้: <b>${esc(L.label)}</b> <span class="mono">${L.lat.toFixed(4)}, ${L.lng.toFixed(4)}</span></span><button class="tg" data-locclear="1">ล้างตำแหน่ง</button></div>`;
+    if(S.locMove){ const c=COUNTRIES[S.locMove.co].cities[S.locMove.ci];
+      body+=`<div class="move">ตำแหน่งนี้อยู่ใกล้ <b>${c.name}</b> มากกว่า${placeName()} <button class="tg sel" data-move="1">ย้ายไป${c.name}</button></div>`; }
+    body+=`<div class="grp radius"><span>รัศมี “รอบตัวฉัน”</span>${[1,2,3,5].map(r=>`<button class="tg ${S.radius===r?"sel":""}" data-radius="${r}">${r} กม.</button>`).join("")}</div>`;
+    if(L.myId) body+=`<div class="savebar"><span class="hint">ย่านที่คุณบันทึกไว้</span><button class="tg" data-delmy="${L.myId}">ลบย่านนี้</button></div>`;
+    else if(!savedAlready) body+=`<div class="savebar"><input id="myname" type="text" autocomplete="off" placeholder="ตั้งชื่อย่าน เช่น แถวโรงแรม" aria-label="ชื่อย่านของฉัน" value="${esc(/^(จุด|ตำแหน่งปัจจุบัน)/.test(L.label)?"":L.label)}"><button class="btn" data-savemy="1">+ บันทึกเป็นย่านของฉัน</button></div>`;
+  }
+  return `<section class="locbox">${body}</section>`;
+}
+function stepArea(){
+  const ci=cityOf(S.country,S.city);
+  let areas=Object.entries(ci.areas).map(([k,[th,en,desc]])=>{
+    return {k,th,en,desc,d:areaDist(k)};
+  });
+  const sortMode=S.areaSort||(S.loc?"near":"default");
+  if(sortMode==="near"&&S.loc) areas.sort((a,b)=>a.d-b.d);
+  let nearCard="";
+  if(S.loc){
+    const na=nearAreas();
+    nearCard=`<button class="opt near ${S.area===NEAR?"sel":""}" data-area="${NEAR}" data-text="ใกล้ รอบ near"><span class="big">รอบ ${esc(S.loc.label)}</span><span class="sub">ย่านใหม่จากตำแหน่ง · รัศมี ${S.radius} กม.</span>
+      <span class="desc">${na.length?"ครอบคลุม "+na.map(a=>ci.areas[a][0]).join(", "):"ค้นหาร้านจริงรอบจุดนี้"}</span><span class="cnt">ร้านจริงจาก Google</span></button>`;
+  }
+  const tgs=[["default","ตามแผนที่"]].concat(S.loc?[["near","ใกล้สุด"]]:[]);
+  return head(3,`ย่านไหนใน${ci.name}`,`${areas.length} ย่าน · หรือใช้ตำแหน่งเพื่อสร้างย่าน “รอบตัวฉัน”`) +
+  locPanel() +
+  `<div class="areabar"><input id="areaq" type="search" placeholder="ค้นหาย่าน เช่น ราเมง, Shibuya, คาเฟ่" autocomplete="off" aria-label="ค้นหาย่าน">
+    <div class="grp">${tgs.map(([k,l])=>`<button class="tg ${sortMode===k?"sel":""}" data-asort="${k}">${l}</button>`).join("")}</div></div>
+  <div class="grid" id="areagrid">${nearCard}${areas.map(a=>`<button class="opt ${S.area===a.k?"sel":""}" data-area="${a.k}" data-text="${esc((a.th+" "+a.en+" "+a.desc).toLowerCase())}"><span class="big">${a.th}</span><span class="sub">${a.en}</span>${a.d!==null?`<span class="dist ${a.d<=S.radius?"in":""}">${distTxt(a.d)}</span>`:""}<span class="desc">${a.desc}</span></button>`).join("")}</div>
+  <div class="empty" id="areaempty" hidden>ไม่เจอย่านที่ค้นหา ลองพิมพ์ชื่อภาษาอังกฤษหรือประเภทอาหาร</div>
+  <div class="actions">${back()}</div>`;
+}
+function stepCuisine(){
+  const bk=S.city?back():`<button class="btn ghost" data-go="0">← เปลี่ยนตำแหน่ง</button>`;
+    const all=S.cuisines.includes("_all");
+    return head(4,"อยากกินอะไร","เลือกได้สูงสุด 3 ประเภท (1 ประเภท = 1 คำขอค้นหา)") +
+    `<div class="chips"><button class="chip ${all?"sel":""}" data-allc="1">ร้านอาหารทุกประเภท</button></div>
+     <div class="grid">${Object.keys(CUISINES).map(k=>`<button class="opt ${S.cuisines.includes(k)?"sel":""}" data-cuisine="${k}"><span class="ico" aria-hidden="true">${CUISINES[k][0]}</span><span class="big">${CUISINES[k][1]}</span></button>`).join("")}</div>
+     ${S.cuisines.length>=3?`<p class="hint">เลือกครบ 3 ประเภทแล้ว กดประเภทที่เลือกไว้เพื่อเอาออก</p>`:""}
+     <div class="actions">${bk}<button class="btn primary" data-next="4" ${S.cuisines.length?"":"disabled"}>ถัดไป: เลือกเวลา →</button></div>`;
+}
+
+function stepTime(){
+  const now=placeNow();
+  if(S.day===null) S.day=now.day;
+  const needDay=S.meal&&!["now","any"].includes(S.meal);
+  return head(5,"ไปกินตอนไหน",`เวลา${S.country?"ท้องถิ่นที่"+placeName():"ในเครื่อง"}ตอนนี้ ${DAYS_FULL[now.day]} ${hhmm(now.min)} น. แอปจะเช็กว่าร้านเปิดหรือปิดในเวลาที่เลือก`) +
+  `<div class="grid">${MEALS.map(m=>`<button class="opt ${S.meal===m.k?"sel":""}" data-meal="${m.k}"><span class="big">${m.lb}</span><span class="sub">${m.sub}</span></button>`).join("")}</div>
+   <div class="row-label" ${needDay?"":"hidden"}>วัน</div>
+   <div class="chips" ${needDay?"":"hidden"}>${DAYS.map((d,i)=>`<button class="chip ${S.day===i?"sel":""}" data-day="${i}">${d}${i===now.day?"<small>วันนี้</small>":""}</button>`).join("")}</div>
+   <div class="actions">${back()}<button class="btn primary" data-next="5" ${S.meal?"":"disabled"}>ดูร้านแนะนำ →</button></div>`;
+}
+
+/* ---------- results ---------- */
+function whenFor(x){
+  if(S.meal==="any") return null;
+  if(S.meal==="now") return (x.real&&x.off!=null) ? offsetNow(x.off) : placeNow();
+  return {day:S.day,min:toMin(MEALS.find(m=>m.k===S.meal).t)};
+}
+function stepResults(){
+  const co=S.country?COUNTRIES[S.country]:null, ar=curArea(), cur=co?co.cur:"$";
+  const cuiTxt=cuisineText();
+  const where=`${ar.th}${S.city?", "+placeName():""}`;
+  const headHTML=(n)=>hero("ร้านแนะนำ",n===null?"กำลังหาร้านให้…":`<em>${n}</em> ร้าน${S.meal!=="any"?"ที่เปิด":""}น่าไป`,
+      `${esc(cuiTxt)} · ${esc(where)}${S.loc&&!ar.near?` · ห่างจาก ${esc(S.loc.label)} ${distTxt(areaDist(S.area))}`:""}`,"fa-trophy");
+  const foot=`<div class="actions"><button class="btn ghost" data-go="4">← เปลี่ยนเวลา</button><button class="btn" data-reset="1">เริ่มค้นหาใหม่</button></div>`;
+  let items, meta="", mapsUrl;
+  if(!REAL()) return headHTML(null)+`<div class="empty"><p><b>ยังไม่ได้ใส่ Google API key</b></p><p class="hint">กดปุ่มตั้งค่า (รูปเฟือง) ด้านบน แล้ววาง key เพื่อเริ่มค้นหาร้านจริง</p></div>`+foot;
+  {
+    const d=ensureReal();
+    if(!d) return headHTML(null)+`<div class="loading"><span class="spin" aria-hidden="true"></span>กำลังค้นหาร้านจริงจาก Google Maps…</div>${'<div class="card sk"></div>'.repeat(3)}`+foot;
+    if(d.err) return headHTML(null)+`<div class="empty"><p class="err">${esc(d.err)}</p><p class="hint">กดปุ่ม “ตั้งค่า” ด้านบนเพื่อตรวจ API key</p></div>`+foot;
+    const ref=S.loc?locPt():[d.center.lat,d.center.lng];
+    items=d.list.map(x=>({...x,dist:km(ref,[x.lat,x.lng])}));
+    meta=`พบ ${d.list.length} ร้านในรัศมี ${d.rm/1000} กม. · ใช้ ${d.calls} คำขอค้นหา`;
+    const kw="best "+(S.cuisines.includes("_all")?"restaurants":S.cuisines.map(k=>CUISINE_Q[k]).join(" "));
+    mapsUrl=`https://www.google.com/maps/search/${encodeURIComponent(kw)}/@${d.center.lat},${d.center.lng},15z`;
+  }
+  const W=items.reduce((s,x)=>s+x.v,0), C=W?items.reduce((s,x)=>s+x.r*x.v,0)/W:4.3, M=200;
+  items.forEach(x=>{ const w=whenFor(x); x.st=w?openReal(x,w.day,w.min):null; x.sm=x.v?(x.v/(x.v+M))*x.r+(M/(x.v+M))*C:0; });
+  if(S.minR) items=items.filter(x=>x.r>=S.minR);
+  if(S.resOnly) items=items.filter(x=>x.resv===true);
+  if(S.openOnly) items=items.filter(x=>x.st&&x.st.open===true);
+  const sorters={near:(a,b)=>(a.dist??0)-(b.dist??0)||b.sm-a.sm, smart:(a,b)=>b.sm-a.sm, rating:(a,b)=>b.r-a.r||b.v-a.v, reviews:(a,b)=>b.v-a.v, price:(a,b)=>(a.p||9)-(b.p||9)||b.sm-a.sm};
+  items.sort(sorters[S.sort]||sorters.smart);
+  const rankOpen=x=>!x.st?1:x.st.open===true?2:x.st.open===null?1:0;
+  if(S.meal!=="any") items.sort((a,b)=>rankOpen(b)-rankOpen(a));
+  const nOpen=S.meal!=="any"?items.filter(x=>x.st&&x.st.open===true).length:items.length;
+  const shown=items.slice(0,S.show), more=items.length-shown.length;
+  const hasDist=items.some(x=>x.dist!=null);
+  const tb=(key,val,lbl)=>`<button class="tg ${S[key]===val?"sel":""}" data-set="${key}" data-val="${val}">${lbl}</button>`;
+  return headHTML(nOpen) +
+    `<div class="toolbar">
+      <div class="grp"><span>เรียงตาม</span>${tb("sort","smart","แนะนำ")}${tb("sort","rating","คะแนน")}${tb("sort","reviews","รีวิวเยอะ")}${hasDist?tb("sort","near","ใกล้สุด"):""}${tb("sort","price","ราคาถูก")}</div>
+      <div class="grp"><span>คะแนนขั้นต่ำ</span>${tb("minR",0,"ทั้งหมด")}${tb("minR",4.3,"4.3+")}${tb("minR",4.5,"4.5+")}</div>
+      <div class="grp">${S.meal!=="any"?`<button class="tg ${S.openOnly?"sel":""}" data-flip="openOnly">เฉพาะที่เปิด</button>`:""}<button class="tg ${S.resOnly?"sel":""}" data-flip="resOnly">รับจอง</button></div>
+    </div>
+    <p class="hint">${meta?esc(meta)+" · ":""}“แนะนำ” ถ่วงคะแนนด้วยจำนวนรีวิว ร้านที่ได้ ★4.8 จาก 40 รีวิวจะไม่แซงร้าน ★4.6 จาก 3,000 รีวิวง่าย ๆ</p>
+    <div class="list">${shown.length?shown.map((x,i)=>cardReal(x,i)).join(""):`<div class="empty">ไม่มีร้านตรงเงื่อนไข ลองลดคะแนนขั้นต่ำ ขยายรัศมี หรือเปลี่ยนเวลา</div>`}</div>
+    ${more>0?`<button class="btn more" data-more="1">ดูเพิ่มอีก ${Math.min(10,more)} ร้าน <span>(เหลือ ${more})</span></button>`:""}
+    <a class="maps" href="${mapsUrl}" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> เปิดผลค้นหาเดียวกันบน <b>Google Maps ↗</b></a>
+    <p class="note">ข้อมูลร้าน คะแนน และเวลาเปิดปิดจาก Google Maps ควรโทรเช็กก่อนไปอีกครั้งในวันหยุดนักขัตฤกษ์</p>
+    ${foot}`;
+}
+function pillFor(x){
+  if(!x.st) return "";
+  if(x.st.open===null) return `<span class="pill p-mute">ไม่มีข้อมูลเวลา</span>`;
+  if(x.st.open) return (x.st.left!=null&&x.st.left<=60)?`<span class="pill p-warn">ใกล้ปิด · อีก ${x.st.left} นาที</span>`:`<span class="pill p-ok">เปิดอยู่</span>`;
+  return `<span class="pill p-bad">ปิดเวลานี้</span>`;
+}
+function scoreHTML(x){
+  const stars="★".repeat(Math.round(x.r))+"☆".repeat(5-Math.round(x.r));
+  return `<div class="score"><span class="num">${x.r?x.r.toFixed(1):"–"}</span><span class="stars" aria-hidden="true">${x.r?stars:""}</span><span class="rv">${x.v.toLocaleString("en-US")} รีวิว</span></div>`;
+}
+function favBtn(id){ return `<button class="fav ${favs.has(id)?"on":""}" data-fav="${esc(id)}" aria-label="บันทึกร้าน">${favs.has(id)?"♥":"♡"}</button>`; }
+
+
+function cardReal(x,i){
+  const w=whenFor(x)||placeNow();
+  const dayIdx=(w.day+6)%7; // weekdayDescriptions เริ่มวันจันทร์
+  const today=x.wd?x.wd[dayIdx]:"";
+  const todayTxt=today?today.replace(/^[^:]+:\s*/,""):"ไม่มีข้อมูลเวลา";
+  const cur=S.country?COUNTRIES[S.country].cur:"$";
+  const resv=x.resv===true?`<span class="pill p-warn">รับจอง</span> <span class="v-note">โทรหรือจองผ่านเว็บร้าน</span>`
+    :x.resv===false?`<span class="pill p-ok">ไม่รับจอง · Walk-in</span>`:`<span class="pill p-mute">ไม่มีข้อมูล</span>`;
+  const dist=x.dist!=null?`<span class="dist in">${distTxt(x.dist)}</span>`:"";
+  const nav=`https://www.google.com/maps/dir/?api=1&destination=${x.lat},${x.lng}&destination_place_id=${encodeURIComponent(x.id)}`;
+  return `<article class="card ${x.st&&x.st.open===false?"closed":""}">
+    <div class="c-head ${x.photo?"wp":""}">${x.photo?`<img class="thumb" src="${esc(x.photo)}" alt="" loading="lazy">`:`<span class="rank ${i<3?"rk1":""}">#${i+1}</span>`}
+      <div>${x.photo?`<span class="rank inl ${i<3?"rk1":""}">#${i+1}</span>`:""}<h3 class="c-name">${esc(x.n)}</h3>
+        <div class="c-meta"><span>${esc(x.type||cuisineText())}</span>${x.p?`<span>${cur.repeat(x.p)}<span class="dim">${cur.repeat(4-x.p)}</span></span>`:""}${pillFor(x)}${dist}</div></div>
+      ${scoreHTML(x)}</div>
+    <div class="facts">
+      <div class="fact"><span class="k">เวลาเปิด–ปิด ${S.meal!=="any"&&S.meal!=="now"?DAYS_FULL[w.day]:"วันนี้"}</span><span class="v">${esc(todayTxt)}</span>
+        ${x.wd?`<details><summary>ดูทั้งสัปดาห์</summary><ul class="wk">${x.wd.map(l=>`<li>${esc(l)}</li>`).join("")}</ul></details>`:""}</div>
+      <div class="fact"><span class="k">โทร</span><span class="v tel">${x.t?`<span class="mono">${esc(x.t)}</span><button class="copy" data-copy="${esc(x.t)}">คัดลอก</button>`:`<span class="v-note">ไม่มีเบอร์ใน Google</span>`}</span></div>
+      <div class="fact"><span class="k">การจอง</span><span class="v">${resv}</span></div>
+      <div class="fact"><span class="k">ที่อยู่</span><span class="v small">${esc(x.addr)}</span></div>
+    </div>
+    <div class="c-foot"><div class="links"><a href="${esc(x.maps)}" target="_blank" rel="noopener"><i class="fa-solid fa-map"></i> Google Maps</a><a class="go" href="${nav}" target="_blank" rel="noopener"><i class="fa-solid fa-diamond-turn-right"></i> นำทาง</a>${x.web?`<a href="${esc(x.web)}" target="_blank" rel="noopener"><i class="fa-solid fa-globe"></i> เว็บไซต์</a>`:""}</div>${favBtn(x.id)}</div>
+    ${x.photoBy?`<p class="credit">รูป: ${esc(x.photoBy)} · Google Maps</p>`:""}
+  </article>`;
+}
+
+/* ---------- render + events ---------- */
 function render(){
- if(S.step===0){app.innerHTML=head(1,"อยากไปกินที่ประเทศไหน","เลือกประเทศก่อน แล้วค่อยเจาะลงเมืองและย่าน")+`<div class="grid">${Object.entries(COUNTRIES).map(([k,v])=>`<button class="card" onclick="S.country='${k}';S.step=1;render()"><span class="big">${v.th}</span><span class="sub">${v.en} · ${Object.keys(v.cities).length} เมือง</span><span class="desc">ค้นหาร้านจริงจาก Google Places</span></button>`).join("")}</div>`;return}
- const co=COUNTRIES[S.country];
- if(S.step===1){app.innerHTML=head(2,`เมืองไหนใน${co.th}`,"เลือกเมืองที่ต้องการ")+`<div class="grid">${Object.entries(co.cities).map(([k,v])=>`<button class="card" onclick="S.city='${k}';S.step=2;render()"><span class="big">${v.th}</span><span class="sub">${v.en}</span><span class="desc">${v.areas.length} ย่าน</span></button>`).join("")}</div><div class="actions">${back()}</div>`;return}
- const ci=co.cities[S.city];
- if(S.step===2){app.innerHTML=head(3,`ย่านไหนใน${ci.th}`,"เลือกย่านที่จะไปกิน")+`<div class="grid">${ci.areas.map(a=>`<button class="card" onclick="S.area=${JSON.stringify(a)};S.step=3;render()"><span class="big">${a}</span><span class="sub">${ci.en}</span><span class="desc">ค้นหาร้านจริงในย่านนี้</span></button>`).join("")}</div><div class="actions">${back()}</div>`;return}
- if(S.step===3){app.innerHTML=head(4,"อยากกินอะไร","เลือกได้มากกว่า 1 ประเภท")+`<div class="chips">${CUISINES.map((c,i)=>`<button class="chip ${S.cuisines.includes(c)?"sel":""}" onclick="toggleCuisine(${i})">${c}</button>`).join("")}</div><div class="actions">${back()}<button class="btn primary" ${S.cuisines.length?"":"disabled"} onclick="searchPlaces()">ค้นหาร้านจริง →</button></div>`;return}
+  renderChrome();
+  const fns=[stepCountry,stepCity,stepArea,stepCuisine,stepTime,stepResults];
+  $("#stage").innerHTML=(S.settings?settingsPanel():"")+fns[S.step]();
+  $("#setBtn").classList.toggle("sel",S.settings);
 }
-function toggleCuisine(i){const c=CUISINES[i],p=S.cuisines.indexOf(c);p>=0?S.cuisines.splice(p,1):S.cuisines.push(c);render()}
-async function searchPlaces(){
- S.step=4; app.innerHTML=head("","กำลังหาร้านที่น่าสนใจ",`${esc(S.area)} · ${esc(COUNTRIES[S.country].cities[S.city].th)}`)+`<div class="loading">กำลังดึงข้อมูลสดจาก Google Places…</div>`;
- try{
-   if(!window.google?.maps?.importLibrary) throw new Error("Google Maps ยังโหลดไม่สำเร็จ หรือ API Key ยังไม่ได้ใส่");
-   const {Place}=await google.maps.importLibrary("places");
-   const co=COUNTRIES[S.country],ci=co.cities[S.city];
-   const q=`${S.cuisines.join(" OR ")} restaurants in ${S.area}, ${ci.en}, ${co.en}`;
-   const {places}=await Place.searchByText({
-     textQuery:q,
-     fields:["id","displayName","formattedAddress","rating","userRatingCount","priceLevel","regularOpeningHours","currentOpeningHours","nationalPhoneNumber","googleMapsURI","types","businessStatus"],
-     maxResultCount:20
-   });
-   showResults(places||[]);
- }catch(e){
-   app.innerHTML=head("","เชื่อม Google Places ไม่สำเร็จ","ตรวจ API Key / Billing / API restrictions")+`<div class="error"><b>รายละเอียด:</b> ${esc(e.message||e)}</div><div class="actions"><button class="btn" onclick="S.step=3;render()">← กลับไปเลือกอาหาร</button></div>`;
- }
-}
-function hoursText(p){
- const h=p.currentOpeningHours||p.regularOpeningHours;
- if(!h) return "Google ไม่มีข้อมูลเวลาเปิด–ปิด";
- if(Array.isArray(h.weekdayDescriptions)) return h.weekdayDescriptions.join(" · ");
- return "มีข้อมูลเวลาเปิด–ปิดบน Google Maps";
-}
-function priceText(v){
- if(!v) return "";
- const m={FREE:"ฟรี",INEXPENSIVE:"฿",MODERATE:"฿฿",EXPENSIVE:"฿฿฿",VERY_EXPENSIVE:"฿฿฿฿"};
- return m[String(v).replace("PRICE_LEVEL_","")]||String(v);
-}
-function showResults(ps){
- ps=ps.filter(p=>p.businessStatus!=="CLOSED_PERMANENTLY").sort((a,b)=>(b.rating||0)-(a.rating||0)||(b.userRatingCount||0)-(a.userRatingCount||0));
- const co=COUNTRIES[S.country],ci=co.cities[S.city];
- app.innerHTML=head("",`${ps.length} ร้านจาก Google Places`,`${esc(S.cuisines.join(", "))} · ${esc(S.area)}, ${ci.th}`)+
- (ps.length?ps.map((p,i)=>`<article class="result"><div class="rhead"><div><div class="rname">#${i+1} ${esc(p.displayName||"ไม่ระบุชื่อ")}</div><div class="meta">${priceText(p.priceLevel)} ${p.userRatingCount?`· ${Number(p.userRatingCount).toLocaleString()} รีวิว`:""}</div></div><div class="score">${p.rating?`★ ${Number(p.rating).toFixed(1)}`:"—"}</div></div><div class="addr">${esc(p.formattedAddress||"")}</div><div class="hours">${esc(hoursText(p))}</div><div class="links">${p.nationalPhoneNumber?`<a href="tel:${esc(p.nationalPhoneNumber)}">โทร ${esc(p.nationalPhoneNumber)}</a>`:""}${p.googleMapsURI?`<a href="${esc(p.googleMapsURI)}" target="_blank" rel="noopener">Google Maps ↗</a>`:""}</div></article>`).join(""):`<div class="empty">ไม่พบร้าน ลองเลือกประเภทอาหารให้น้อยลงหรือเปลี่ยนย่าน</div>`)+
- `<p class="note">ข้อมูลชื่อร้าน ที่อยู่ คะแนน รีวิว เวลาเปิด–ปิด และเบอร์โทรมาจาก Google Places ตามข้อมูลที่ Google มีสำหรับแต่ละร้าน</p><div class="actions"><button class="btn" onclick="S.step=3;render()">← เปลี่ยนประเภท</button><button class="btn primary" onclick="S={step:0,country:null,city:null,area:null,cuisines:[]};render()">เริ่มใหม่</button></div>`;
-}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  const d=b.dataset;
+  if(b.id==="setBtn"){ S.settings=!S.settings; render(); window.scrollTo({top:0}); return; }
+  if(d.savekey){ const v=$("#apikey").value.trim(); try{ v?localStorage.setItem("kd-key",v):localStorage.removeItem("kd-key"); }catch(err){} location.reload(); return; }
+  if(d.delkey){ try{ localStorage.removeItem("kd-key"); }catch(err){} location.reload(); return; }
+  if(d.go!==undefined){ go(+d.go); return; }
+  if(d.gps){ useGPS(); return; }
+  if(d.country){ if(S.country!==d.country){S.city=S.area=null;S.cuisines=[];S.day=null;} S.country=d.country; const cs=Object.keys(COUNTRIES[d.country].cities); if(cs.length===1){S.city=cs[0];go(2);} else go(1); return; }
+  if(d.city){ if(S.city!==d.city){S.area=null;S.cuisines=[];} S.city=d.city; go(2); return; }
+  if(d.area){ if(S.area!==d.area) S.cuisines=[]; S.area=d.area; go(3); return; }
+  if(d.asort){ S.areaSort=d.asort; render(); return; }
+  if(d.lm!==undefined){ const l=LANDMARKS[S.city][+d.lm]; setLoc(l[1],l[2],l[0],{lm:+d.lm}); render(); return; }
+  if(d.my){ const m=myAreas.find(m=>String(m.id)===d.my); if(m){ setLoc(m.lat,m.lng,m.name,{myId:m.id}); S.area=NEAR; S.cuisines=[]; go(3);} return; }
+  if(d.locgo){ const r=parseLoc($("#locq").value); if(r.err) S.locErr=r.err; else setLoc(r.lat,r.lng,"จุดที่ปักหมุด"); render(); return; }
+  if(d.locclear){ S.loc=null; S.locErr=""; S.locMove=null; S.areaSort=null; if(S.area===NEAR){S.area=null;S.cuisines=[];} render(); return; }
+  if(d.radius){ S.radius=+d.radius; render(); return; }
+  if(d.move){ const {co,ci}=S.locMove; Object.assign(S,{country:co,city:ci,area:null,cuisines:[],day:null,locMove:null}); S.loc={...S.loc,lm:undefined}; render(); return; }
+  if(d.savemy){ const name=($("#myname").value.trim()||"ย่านของฉัน").slice(0,40), id=Date.now();
+    myAreas.push({id,city:S.city,name,lat:S.loc.lat,lng:S.loc.lng}); saveAreas(); S.loc={...S.loc,label:name,myId:id,lm:undefined}; render(); return; }
+  if(d.delmy){ myAreas=myAreas.filter(m=>String(m.id)!==d.delmy); saveAreas(); S.loc={...S.loc,myId:undefined}; render(); return; }
+  if(d.cuisine){
+    const i=S.cuisines.indexOf(d.cuisine);
+    if(i>=0) S.cuisines.splice(i,1);
+    else { S.cuisines=S.cuisines.filter(k=>k!=="_all"); if(S.cuisines.length<3) S.cuisines.push(d.cuisine); }
+    render(); return;
+  }
+  if(d.allc){
+    S.cuisines=S.cuisines.includes("_all")?[]:["_all"];
+    render(); return;
+  }
+  if(d.meal){ S.meal=d.meal; render(); return; }
+  if(d.day!==undefined){ S.day=+d.day; render(); return; }
+  if(d.next){ S.show=10; go(+d.next); return; }
+  if(d.set){ S[d.set]=d.set==="sort"?d.val:+d.val; S.show=10; render(); return; }
+  if(d.flip){ S[d.flip]=!S[d.flip]; S.show=10; render(); return; }
+  if(d.more){ S.show+=10; render(); return; }
+  if(d.fav){ favs.has(d.fav)?favs.delete(d.fav):favs.add(d.fav); saveFavs(); render(); return; }
+  if(d.reset){ Object.assign(S,{step:0,country:null,city:null,area:null,cuisines:[],day:null,meal:null,minR:0,resOnly:false,openOnly:false,sort:"smart",areaSort:null,locMove:null,show:10}); render(); return; }
+  if(d.copy){
+    const done=()=>{ b.textContent="คัดลอกแล้ว"; setTimeout(()=>b.textContent="คัดลอก",1500); };
+    try{ navigator.clipboard.writeText(d.copy).then(done,()=>selectText(b)); }catch(err){ selectText(b); }
+  }
+});
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Enter") return;
+  const map={locq:"[data-locgo]",myname:"[data-savemy]",apikey:"[data-savekey]"};
+  if(map[e.target.id]){ e.preventDefault(); const t=document.querySelector(map[e.target.id]); if(t) t.click(); }
+});
+document.addEventListener("input",e=>{
+  if(e.target.id!=="areaq") return;
+  const q=e.target.value.trim().toLowerCase(); let shown=0;
+  document.querySelectorAll("#areagrid .opt").forEach(o=>{ const hit=!q||o.dataset.text.includes(q); o.hidden=!hit; if(hit) shown++; });
+  $("#areaempty").hidden=shown>0;
+});
+function selectText(b){ const el=b.previousElementSibling; const r=document.createRange(); r.selectNodeContents(el); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+if(!REAL()) S.settings=true;
 render();
 </script>
 </body>
