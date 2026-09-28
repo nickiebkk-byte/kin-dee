@@ -222,6 +222,9 @@ details summary{cursor:pointer;color:var(--violet);font-size:12px;font-weight:60
   .thumb{width:56px;height:56px;border-radius:14px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.pchip{display:inline-flex;align-items:center;gap:2px}
+.pdel{border:0;background:none;color:var(--ink-3);font-size:18px;line-height:1;padding:0 6px;border-radius:50%}
+.pdel:hover{color:var(--bad)}
 </style>
 </head>
 <body>
@@ -396,6 +399,9 @@ const S = {step:0,country:null,city:null,area:null,cuisines:[],day:null,meal:nul
 let favs=new Set(), myAreas=[];
 try{ favs=new Set(JSON.parse(localStorage.getItem("kd-favs")||"[]")); }catch(e){}
 try{ myAreas=JSON.parse(localStorage.getItem("kd-areas")||"[]"); }catch(e){}
+let myPlaces=[];
+try{ myPlaces=JSON.parse(localStorage.getItem("kd-places")||"[]"); }catch(e){}
+const savePlaces=()=>{ try{ localStorage.setItem("kd-places",JSON.stringify(myPlaces)); }catch(e){} };
 const saveFavs=()=>{ try{ localStorage.setItem("kd-favs",JSON.stringify([...favs])); }catch(e){} };
 const saveAreas=()=>{ try{ localStorage.setItem("kd-areas",JSON.stringify(myAreas)); }catch(e){} };
 const NEAR="__near";
@@ -470,6 +476,12 @@ async function fetchReal(center,radiusM,cuis){
   }
   const out={list:[...map.values()],calls:qs.length};
   cache.set(ck,out); return out;
+}
+async function findPlaces(q){
+  await loadGoogle();
+  const {Place}=await google.maps.importLibrary("places");
+  const r=await Place.searchByText({textQuery:q, fields:["id","displayName","formattedAddress","location"], maxResultCount:5, language:"th"});
+  return (r.places||[]).filter(p=>p.location).map(p=>({id:p.id,name:p.displayName||q,addr:p.formattedAddress||"",lat:p.location.lat(),lng:p.location.lng()}));
 }
 function realQuery(){
   const c=S.area===NEAR?{lat:S.loc.lat,lng:S.loc.lng}:{lat:GEO[S.area][0],lng:GEO[S.area][1]};
@@ -588,7 +600,18 @@ function stepCountry(){
   return head(1,"อยากไปกินที่ไหนดี","ใช้ตำแหน่งปัจจุบัน หรือเลือกประเทศ เมือง และย่านเอง") + gpsCard() + `<div class="row-label">หรือเลือกประเทศ</div>` +
   `<div class="grid">${Object.entries(COUNTRIES).map(([k,c])=>{
     return `<button class="opt ${S.country===k?"sel":""}" data-country="${k}"><span class="big">${c.name}</span><span class="sub">${c.en} · ${Object.keys(c.cities).length} เมือง</span><span class="cnt">${Object.values(c.cities).reduce((s,ci)=>s+Object.keys(ci.areas).length,0)} ย่าน</span></button>`;
-  }).join("")}</div>`;
+  }).join("")}</div>` + addPlacePanel();
+}
+function addPlacePanel(){
+  const hits=S.placeHits||[];
+  return `<section class="locbox">
+    <div class="loc-h"><b><i class="fa-solid fa-earth-americas"></i> เพิ่มประเทศ / เมืองอื่น</b><span>พิมพ์ชื่อเมือง ย่าน หรือสถานที่ได้ทุกประเทศ เช่น Kyoto, Paris Le Marais, Taipei 101 แล้วแอปจะค้นร้านรอบจุดนั้น</span></div>
+    ${myPlaces.length?`<div class="chips">${myPlaces.map(m=>`<span class="pchip"><button class="chip mine" data-myplace="${esc(m.id)}"><i class="fa-solid fa-location-dot"></i> ${esc(m.name)}</button><button class="pdel" data-delplace="${esc(m.id)}" aria-label="ลบ ${esc(m.name)}">×</button></span>`).join("")}</div>`:""}
+    <div class="locin"><input id="placeq" type="text" autocomplete="off" placeholder="เช่น Kyoto, Singapore, Hong Kong Mong Kok" aria-label="ชื่อเมืองหรือสถานที่"><button class="btn primary" data-placego="1" ${S.placeBusy?"disabled":""}>${S.placeBusy?"กำลังค้น…":`<i class="fa-solid fa-magnifying-glass"></i> ค้นหา`}</button></div>
+    ${!REAL()?`<p class="err">ต้องใส่ Google API key ก่อน (ปุ่มเฟืองด้านบน)</p>`:""}
+    ${S.placeErr?`<p class="err">${esc(S.placeErr)}</p>`:""}
+    ${hits.length?`<div class="grid">${hits.map((h,i)=>`<button class="opt" data-hit="${i}"><span class="big">${esc(h.name)}</span><span class="desc">${esc(h.addr)}</span><span class="cnt">เลือกและค้นร้านรอบนี้ →</span></button>`).join("")}</div>`:""}
+  </section>`;
 }
 function stepCity(){
   const co=COUNTRIES[S.country];
@@ -699,6 +722,7 @@ function stepResults(){
     `<div class="toolbar">
       <div class="grp"><span>เรียงตาม</span>${tb("sort","smart","แนะนำ")}${tb("sort","rating","คะแนน")}${tb("sort","reviews","รีวิวเยอะ")}${hasDist?tb("sort","near","ใกล้สุด"):""}${tb("sort","price","ราคาถูก")}</div>
       <div class="grp"><span>คะแนนขั้นต่ำ</span>${tb("minR",0,"ทั้งหมด")}${tb("minR",4.3,"4.3+")}${tb("minR",4.5,"4.5+")}</div>
+      ${S.area===NEAR?`<div class="grp"><span>รัศมี</span>${[1,2,3,5].map(r=>`<button class="tg ${S.radius===r?"sel":""}" data-radius="${r}">${r} กม.</button>`).join("")}</div>`:""}
       <div class="grp">${S.meal!=="any"?`<button class="tg ${S.openOnly?"sel":""}" data-flip="openOnly">เฉพาะที่เปิด</button>`:""}</div>
     </div>
     <p class="hint">${meta?esc(meta)+" · ":""}“แนะนำ” ถ่วงคะแนนด้วยจำนวนรีวิว ร้านที่ได้ ★4.8 จาก 40 รีวิวจะไม่แซงร้าน ★4.6 จาก 3,000 รีวิวง่าย ๆ</p>
@@ -763,6 +787,20 @@ document.addEventListener("click",e=>{
   if(d.delkey){ try{ localStorage.removeItem("kd-key"); }catch(err){} location.reload(); return; }
   if(d.go!==undefined){ go(+d.go); return; }
   if(d.gps){ useGPS(); return; }
+  if(d.placego){
+    const q=$("#placeq").value.trim(); if(!q){ S.placeErr="พิมพ์ชื่อเมืองหรือสถานที่ก่อน"; render(); return; }
+    if(!REAL()){ S.settings=true; render(); return; }
+    S.placeBusy=true; S.placeErr=""; S.placeHits=[]; render();
+    findPlaces(q).then(h=>{ S.placeHits=h; if(!h.length) S.placeErr="ไม่พบสถานที่นี้ ลองพิมพ์เป็นภาษาอังกฤษ หรือใส่ชื่อประเทศต่อท้าย"; })
+      .catch(e=>{ S.placeErr="ค้นหาไม่สำเร็จ: "+(e&&e.message?e.message:e); })
+      .finally(()=>{ S.placeBusy=false; render(); const i=$("#placeq"); if(i) i.value=q; });
+    return;
+  }
+  if(d.hit!==undefined){ const h=S.placeHits[+d.hit]; if(!h) return;
+    myPlaces=[h,...myPlaces.filter(m=>m.id!==h.id)].slice(0,12); savePlaces(); S.placeHits=[]; S.radius=Math.max(S.radius,3);
+    applyPoint(h.lat,h.lng,h.name); return; }
+  if(d.myplace){ const m=myPlaces.find(m=>m.id===d.myplace); if(m){ S.radius=Math.max(S.radius,3); applyPoint(m.lat,m.lng,m.name); } return; }
+  if(d.delplace){ myPlaces=myPlaces.filter(m=>m.id!==d.delplace); savePlaces(); render(); return; }
   if(d.country){ if(S.country!==d.country){S.city=S.area=null;S.cuisines=[];S.day=null;} S.country=d.country; const cs=Object.keys(COUNTRIES[d.country].cities); if(cs.length===1){S.city=cs[0];go(2);} else go(1); return; }
   if(d.city){ if(S.city!==d.city){S.area=null;S.cuisines=[];} S.city=d.city; go(2); return; }
   if(d.area){ if(S.area!==d.area) S.cuisines=[]; S.area=d.area; go(3); return; }
@@ -801,7 +839,7 @@ document.addEventListener("click",e=>{
 });
 document.addEventListener("keydown",e=>{
   if(e.key!=="Enter") return;
-  const map={locq:"[data-locgo]",myname:"[data-savemy]",apikey:"[data-savekey]"};
+  const map={locq:"[data-locgo]",myname:"[data-savemy]",apikey:"[data-savekey]",placeq:"[data-placego]"};
   if(map[e.target.id]){ e.preventDefault(); const t=document.querySelector(map[e.target.id]); if(t) t.click(); }
 });
 document.addEventListener("input",e=>{
