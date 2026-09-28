@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>กินไหนดี · ตัวอย่างรูปและธีม</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f1eeff;--ink:#1e293b;--ink2:#475569;--ink3:#94a3b8;--line:#e7e1fb;--violet:#6d28d9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Prompt",system-ui,sans-serif;padding:0 16px 60px}
+.wrap{max-width:1000px;margin:0 auto}
+header{padding:28px 0 8px}
+h1{margin:0;font-size:30px}
+h1 span{background:#facc15;padding:0 8px;border-radius:8px}
+.lead{color:var(--ink2);margin:6px 0 0}
+h2{font-size:22px;margin:34px 0 4px;display:flex;align-items:center;gap:10px}
+h2 b{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:10px;background:#1e1b4b;color:#facc15;font-size:15px}
+.note{color:var(--ink2);font-size:14px;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.pc{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;box-shadow:0 6px 14px -6px rgba(15,23,42,.1),0 22px 40px -18px rgba(109,40,217,.2)}
+.pc .im{position:relative;aspect-ratio:16/10;background:linear-gradient(160deg,#312e81,#0f172a);overflow:hidden}
+.pc .im img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pc .im .fb{position:absolute;inset:0;display:grid;place-items:center;color:#fff9;font-size:13px;text-align:center;padding:10px}
+.pc .im .cr{position:absolute;left:8px;bottom:6px;font-size:9.5px;color:#fff;text-shadow:0 1px 2px #000c}
+.pc .tx{padding:10px 14px 12px}
+.pc .tx b{display:block;font-size:17px}
+.pc .tx small{color:var(--ink3);font-size:12px}
+.city .im{aspect-ratio:4/3}
+/* themes */
+.themes{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
+.th{border-radius:26px;padding:14px;background:var(--t-bg);color:var(--t-ink);border:1px solid rgba(0,0,0,.06);box-shadow:0 18px 40px -22px rgba(15,23,42,.45);display:flex;flex-direction:column;gap:10px}
+.th .lbl{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.th .lbl b{font-size:17px}
+.th .lbl span{font-size:12px;color:var(--t-muted)}
+.th .hdr{display:flex;align-items:center;gap:8px}
+.th .logo{width:30px;height:30px;border-radius:9px;background:var(--t-primary);display:grid;place-items:center;color:var(--t-on);font-size:15px}
+.th .name{font-weight:700;font-size:15px}
+.th .name i{font-style:normal;background:var(--t-accent);color:var(--t-accent-ink);padding:0 5px;border-radius:5px;margin-left:2px}
+.th .hero{border-radius:20px;padding:16px;color:#fff;background:var(--t-hero)}
+.th .hero small{color:var(--t-accent);font-weight:700;font-size:11px;letter-spacing:.1em}
+.th .hero div{font-size:21px;font-weight:700;line-height:1.2}
+.th .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.th .opt{background:var(--t-card);border:1px solid var(--t-line);border-radius:16px;overflow:hidden;font-size:13px;font-weight:600}
+.th .opt .ph{height:54px;background:var(--t-hero)}
+.th .opt .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.th .opt p{margin:0;padding:6px 10px 8px}
+.th .opt.sel{background:var(--t-primary);color:var(--t-on);border-color:transparent}
+.th .rc{background:var(--t-card);border:1px solid var(--t-line);border-radius:16px;padding:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.th .rc b{font-size:14px}
+.th .rc small{display:block;color:var(--t-muted);font-size:11.5px}
+.th .score{background:var(--t-primary);color:var(--t-on);border-radius:12px;padding:5px 9px;font-weight:700;font-size:16px}
+.th .btn{background:var(--t-accent);color:var(--t-accent-ink);border-radius:999px;padding:9px;text-align:center;font-weight:700;font-size:13px}
+.sw{display:flex;gap:4px}
+.sw i{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.1)}
+footer{margin-top:30px;font-size:12px;color:var(--ink3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>กินไหน<span>ดี</span> · ตัวอย่าง</h1>
+  <p class="lead">หน้านี้เป็นตัวอย่างให้เลือกก่อนแก้แอปจริง รูปเมืองและรูปอาหารดึงจาก Wikipedia (ฟรี ไม่เสียค่า Google)</p>
+</header>
+
+<h2><b>1</b> รูปเมือง</h2>
+<p class="note">รูปหลักของหน้าเมืองนั้นใน Wikipedia</p>
+<div class="grid" id="cities"></div>
+
+<h2><b>2</b> รูปประเภทอาหาร</h2>
+<p class="note">รูปจากหน้าเมนูนั้นใน Wikipedia ส่วนใหญ่เป็นรูปจานอาหารชัด ๆ ถ้าอันไหนไม่ถูกใจบอกได้ ผมเปลี่ยนเมนูอ้างอิงให้</p>
+<div class="grid" id="foods"></div>
+
+<h2><b>3</b> ธีมสี 10 แบบ</h2>
+<p class="note">บอกเลขธีมที่ชอบ ผมจะเปลี่ยนทั้งแอปให้ หรือจะเพิ่มปุ่มให้สลับธีมเองในแอปก็ได้</p>
+<div class="themes" id="themes"></div>
+
+<footer>รูปจาก Wikipedia / Wikimedia Commons ตามสัญญาอนุญาตของแต่ละรูป</footer>
+</div>
+<script>
+const CITIES=[["โตเกียว","Tokyo"],["โอซาก้า","Osaka"],["กรุงเทพฯ","Bangkok"],["เชียงใหม่","Chiang_Mai"],["โซล","Seoul"]];
+const FOODS=[["ราเมง / เส้น","Ramen"],["ซูชิ / โอมากาเสะ","Sushi"],["ปิ้งย่าง / ยากินิคุ","Yakiniku"],["ร้านนั่งดื่ม / อิซากายะ","Yakitori"],
+  ["เทมปุระ / ทงคัตสึ","Tonkatsu"],["โอโคโนมิยากิ","Okonomiyaki"],["ข้าวหน้า / ดงบุริ","Donburi"],["แกงกะหรี่ / โยโชคุ","Japanese_curry"],
+  ["ไฟน์ไดนิ่ง","Kaiseki"],["อาหารไทย","Pad_thai"],["อาหารเกาหลี","Samgyeop-sal"],["ซีฟู้ด","Chilli_crab"],["สตรีทฟู้ด","Street_food"],["คาเฟ่ / บรันช์","Latte_art"],["ของหวาน","Parfait"]];
+const THEMES=[
+ {n:"Lavender (MY TRIP)",d:"แบบปัจจุบัน ม่วงอ่อน น้ำเงิน เหลือง",bg:"#f1eeff",card:"#fff",ink:"#1e293b",muted:"#64748b",line:"#e7e1fb",primary:"#2563eb",on:"#fff",accent:"#facc15",accentInk:"#1e293b",hero:"linear-gradient(160deg,#1e1b4b,#0f172a)"},
+ {n:"Matcha",d:"เขียวชาเขียว สงบ สบายตา",bg:"#eef4ea",card:"#fff",ink:"#1f2a22",muted:"#5f6f63",line:"#d7e4d2",primary:"#3f7d4e",on:"#fff",accent:"#e9c46a",accentInk:"#1f2a22",hero:"linear-gradient(160deg,#1f3d2b,#0f1f16)"},
+ {n:"Sakura",d:"ชมพูซากุระ อบอุ่น น่ารัก",bg:"#fdf0f3",card:"#fff",ink:"#3b1f2b",muted:"#8a6572",line:"#f6d6df",primary:"#d6336c",on:"#fff",accent:"#ffd6a5",accentInk:"#3b1f2b",hero:"linear-gradient(160deg,#5a1f3a,#2a0f1d)"},
+ {n:"Ocean",d:"ฟ้าทะเล สดชื่น",bg:"#e8f4fb",card:"#fff",ink:"#0b2545",muted:"#52708f",line:"#cfe6f3",primary:"#0077b6",on:"#fff",accent:"#90e0ef",accentInk:"#0b2545",hero:"linear-gradient(160deg,#0b2545,#13315c)"},
+ {n:"Sunset",d:"ส้มพระอาทิตย์ตก เจริญอาหาร",bg:"#fff1e6",card:"#fff",ink:"#3d1308",muted:"#8c5b45",line:"#fbdcc6",primary:"#e85d04",on:"#fff",accent:"#ffba08",accentInk:"#3d1308",hero:"linear-gradient(160deg,#6a1b09,#3d1308)"},
+ {n:"Midnight",d:"โหมดมืด ม่วงไฟฟ้า อ่านง่ายตอนกลางคืน",bg:"#0f1115",card:"#1a1d24",ink:"#e5e7eb",muted:"#9ca3af",line:"#2a2f3a",primary:"#7c5cff",on:"#fff",accent:"#22d3ee",accentInk:"#0f1115",hero:"linear-gradient(160deg,#241a52,#0b0c10)"},
+ {n:"Tokyo Neon",d:"มืด ชมพูนีออน ฟ้าไซเบอร์",bg:"#120a1f",card:"#1d1230",ink:"#f5ecff",muted:"#b9a3d6",line:"#33204f",primary:"#ff2e88",on:"#fff",accent:"#00f0ff",accentInk:"#120a1f",hero:"linear-gradient(160deg,#3a0d5c,#120a1f)"},
+ {n:"Minimal Mono",d:"ขาวดำเรียบ ไฮไลต์เหลือง",bg:"#f5f5f4",card:"#fff",ink:"#111111",muted:"#6b6b6b",line:"#e2e2e0",primary:"#111111",on:"#fff",accent:"#fde047",accentInk:"#111111",hero:"linear-gradient(160deg,#1c1c1c,#000)"},
+ {n:"Thai Gold",d:"ทองแดง แบบวัดไทย หรูหรา",bg:"#fbf6ea",card:"#fffdf7",ink:"#3a1a0a",muted:"#8a6a4a",line:"#eadfc4",primary:"#9a2a1a",on:"#fff",accent:"#d4a017",accentInk:"#2a1406",hero:"linear-gradient(160deg,#5a0f0f,#2a0707)"},
+ {n:"Mint Candy",d:"เขียวมิ้นต์ ชมพูแตงโม สดใส",bg:"#eafaf6",card:"#fff",ink:"#134e4a",muted:"#4d7c77",line:"#c9eee6",primary:"#14b8a6",on:"#fff",accent:"#fb7185",accentInk:"#fff",hero:"linear-gradient(160deg,#134e4a,#0b2f2c)"}
+];
+const cache={};
+async function wiki(title){
+  if(cache[title]) return cache[title];
+  const p=fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`).then(r=>r.ok?r.json():null).then(j=>{
+    const src=j&&(j.thumbnail&&j.thumbnail.source||j.originalimage&&j.originalimage.source);
+    return src?src.replace(/\/(\d+)px-/,"/640px-"):null;
+  }).catch(()=>null);
+  cache[title]=p; return p;
+}
+function card(name,title,cls){
+  const el=document.createElement("div"); el.className="pc "+(cls||"");
+  el.innerHTML=`<div class="im"><span class="fb">กำลังโหลดรูป…</span></div><div class="tx"><b>${name}</b><small>Wikipedia: ${title.replace(/_/g," ")}</small></div>`;
+  wiki(title).then(src=>{ const im=el.querySelector(".im");
+    im.innerHTML=src?`<img src="${src}" alt="${name}" loading="lazy"><span class="cr">Wikipedia</span>`:`<span class="fb">ไม่มีรูปในหน้านี้</span>`; });
+  return el;
+}
+CITIES.forEach(([n,t])=>document.getElementById("cities").appendChild(card(n,t,"city")));
+FOODS.forEach(([n,t])=>document.getElementById("foods").appendChild(card(n,t)));
+const tw=document.getElementById("themes");
+THEMES.forEach((t,i)=>{
+  const el=document.createElement("div"); el.className="th";
+  el.style.cssText=`--t-bg:${t.bg};--t-card:${t.card};--t-ink:${t.ink};--t-muted:${t.muted};--t-line:${t.line};--t-primary:${t.primary};--t-on:${t.on};--t-accent:${t.accent};--t-accent-ink:${t.accentInk};--t-hero:${t.hero}`;
+  el.innerHTML=`<div class="lbl"><b>${i+1}. ${t.n}</b><div class="sw">${[t.bg,t.primary,t.accent].map(c=>`<i style="background:${c}"></i>`).join("")}</div></div>
+   <span style="font-size:12px;color:var(--t-muted);margin-top:-6px">${t.d}</span>
+   <div class="hdr"><span class="logo">🍴</span><span class="name">กินไหน<i>ดี</i></span></div>
+   <div class="hero"><small>★ ขั้นที่ 4 / 5</small><div>อยากกินอะไร</div></div>
+   <div class="row"><div class="opt sel"><div class="ph" data-w="Ramen"></div><p>ราเมง</p></div><div class="opt"><div class="ph" data-w="Sushi"></div><p>ซูชิ</p></div></div>
+   <div class="rc"><div><b>#1 ร้านราเมงตัวอย่าง</b><small>ชินจูกุ · 450 ม. · เปิดอยู่</small></div><span class="score">4.7</span></div>
+   <div class="btn">ดูร้านแนะนำ →</div>`;
+  el.querySelectorAll("[data-w]").forEach(ph=>wiki(ph.dataset.w).then(src=>{ if(src) ph.innerHTML=`<img src="${src}" alt="">`; }));
+  tw.appendChild(el);
+});
+</script>
+</body>
+</html>
